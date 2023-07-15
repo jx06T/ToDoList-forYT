@@ -1,0 +1,50 @@
+{
+   "manifest_version": 3,
+   "name": "ToDoList-forYT",
+   "description": "YT?Nooooooooooo!",
+   "version": "0.1",
+   "background": {
+      "service_worker": "background.js"
+   },
+   "action": {
+      "default_popup": "popup.html",
+      "default_icon": {
+         "16": "images/ToDoYT16.png",
+         "32": "images/ToDoYT32.png",
+         "48": "images/ToDoYT48.png",
+         "128": "images/ToDoYT128.png"
+      }
+   },
+   "permissions": [
+      "tabs",
+      "scrispting",
+      "activeTab",
+      "storage"
+   ],
+   "host_permissions": [
+      "https://app.simplenote.com/publish/*",
+      "http://*/*",
+      "https://*/*"
+   ],
+   "icons": {
+      "16": "images/ToDoYT16.png",
+      "32": "images/ToDoYT32.png",
+      "48": "images/ToDoYT48.png",
+      "128": "images/ToDoYT128.png"
+   },
+   "content_scripts": [
+      {
+         "js": [
+            "content.js"
+         ],
+         "css": [
+            "content.css"
+         ],
+         "matches": [
+            "https://*/*",
+            "http://*/*"
+         ]
+      }
+   ],
+   "commands": {}
+}
