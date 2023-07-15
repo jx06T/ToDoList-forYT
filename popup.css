@@ -1,0 +1,32 @@
+.chart {
+    height: 180px;
+}
+
+.NextWeek {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 20px;
+    width: 100%;
+    margin-top: -30px;
+    margin-left: -10px;
+}
+
+.NextWeek a {
+    font-size: 24px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#lastWeek {
+    margin-right: 30%;
+}
+
+#nextWeek {
+    margin-left: 30%;
+}
+
+hr {
+    margin: 20px;
+}

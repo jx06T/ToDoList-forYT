@@ -4,12 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="popup.css">
     <title>browser usage time</title>
 </head>
 
 <body>
     <!-- <canvas id="myChart" style="width:100%;max-width:600px"></canvas> -->
-    <canvas id="myChart"></canvas>
+    <canvas id="myChart" class="Chart"></canvas>
+    <hr>
+    <canvas id="myChart2" class="chart"></canvas>
+    <div class="NextWeek">
+        <a id="lastWeek">&lt;</a>
+        <a id="nextWeek">&gt;</a>
+    </div>
     <script src="Chart.js"></script>
     <script src="popup.js"></script>
 

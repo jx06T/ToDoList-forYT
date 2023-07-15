@@ -96,6 +96,7 @@ window.addEventListener('blur', () => {
         })
     }
 });
+
 window.addEventListener('beforeunload', () => {
     Onblur()
     if (IamKing) {
@@ -103,6 +104,7 @@ window.addEventListener('beforeunload', () => {
         chrome.runtime.sendMessage({ action: "NotKing" })
     }
 });
+
 window.addEventListener('focus', () => {
     Onfocus()
 });
