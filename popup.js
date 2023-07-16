@@ -31,7 +31,7 @@ function initChart() {
         });
     });
     chrome.storage.local.get(["aWeek"]).then((result) => {
-        let aWeek = result.aWeek[WeekCount + 2]
+        let aWeek = result.aWeek[result.aWeek.length - 1 + WeekCount]
         let aWeekBTdataForDraw = CaWeekBT(aWeek)
         aWeekBrowsingTimenew = new Chart("myChart2", {
             type: 'bar',
@@ -95,7 +95,10 @@ function UpDataImg() {
         TodayBrowsingTimenew.update();
     })
     chrome.storage.local.get(["aWeek"]).then((result) => {
-        let aWeek = result.aWeek[WeekCount + 2]
+        if (result.aWeek.length - 1 + WeekCount < 0) {
+            return
+        }
+        let aWeek = result.aWeek[result.aWeek.length - 1 + WeekCount]
         let aWeekBTdataForDraw = CaWeekBT(aWeek)
         aWeekBrowsingTimenew.data.datasets[0].data = aWeekBTdataForDraw[0];
         aWeekBrowsingTimenew.options.tooltips.callbacks.title = (tooltipItem) => {
@@ -165,7 +168,7 @@ NextWeek.addEventListener("click", () => {
 })
 const LastWeek = document.getElementById("lastWeek")
 LastWeek.addEventListener("click", () => {
-    if (WeekCount > -2) {
+    if (WeekCount > -4) {
         WeekCount--
         UpDataImg()
     }

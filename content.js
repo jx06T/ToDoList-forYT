@@ -5,7 +5,7 @@ let loop
 let tag = GetTag()
 let InotKing = false
 let IamKing = false
-
+let first = true
 function GetTag() {
     const Myhostname = location.hostname
     return Myhostname
@@ -15,17 +15,29 @@ function Onfocus() {
     if (IamKing) {
         IamKing = false
         chrome.runtime.sendMessage({ action: "NotKing" })
+    } else {
+        chrome.runtime.sendMessage({ action: "Onfocus" })
     }
+
     enterTime = performance.now(); // 記錄進入網站的時間戳
     document.addEventListener('wheel', () => { handleMouseMove(10) });
     document.addEventListener('mousemove', () => { handleMouseMove(1) });
     moveCount = 0;
-
+    if (loop) {
+        Onblur()
+    }
     loop = setInterval(() => {
         console.log(InotKing, moveCount)
         chrome.runtime.sendMessage({ action: "GetKingTag" }).then((r) => {
-            if (r.KingTag != null) {
-                if (moveCount < 200) {
+            if (first || r.KingTag != null) {
+                if (moveCount < 150) {
+                    if (first) {
+                        if (!isPlayingVideo()) {
+                            first = false
+                            Onblur()
+                            return
+                        }
+                    }
                     if (!InotKing) {
                         UpData(tag)
                         InotKing = true
@@ -55,8 +67,8 @@ function Onblur() {
     } else {
         UpData(tag)
     }
-
     clearInterval(loop);
+    loop = undefined
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('wheel', handleMouseMove);
 
@@ -78,9 +90,9 @@ function handleMouseMove(t) {
     moveCount += t;
 }
 
+const videos = document.querySelectorAll("video")
 function isPlayingVideo() {
     let isPlay = false
-    const videos = document.querySelectorAll("video")
     videos.forEach((video) => {
         isPlay = !video.paused || isPlay
     })
