@@ -196,7 +196,7 @@ function CaWeekBT(data) {
 
 }
 const ToToday = document.querySelector('#today')
-ToToday.addEventListener("click",UpDataImg)
+ToToday.addEventListener("click", UpDataImg)
 initChart()
 setTimeout(() => {
     UpDataImg()
