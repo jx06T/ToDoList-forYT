@@ -1,24 +1,34 @@
 let TodayBrowsingTimenew
 let aWeekBrowsingTimenew
+let aWeek
 let TodayTotal = 0
+let AllRule
+let tagColors = {}
+chrome.storage.local.get(["AllRule"]).then((result) => {
+    AllRule = result.AllRule
+    AllRule.forEach(item => {
+        tagColors[item.tag] = item.color;
+    });
+    tagColors["ELSE"] = "#c8e0e4"
+})
+
+
+function getColorByTag(tag) {
+    return tagColors[tag];
+}
+
 function initChart() {
     chrome.storage.local.get(["AllBrowsingTime"]).then((result) => {
         let BrowsingTime = result.AllBrowsingTime.BrowsingTime
-        let BTdataForDraw = calculationBT(BrowsingTime)
+        const r = calculationBT(BrowsingTime)
         TodayBrowsingTimenew = new Chart("myChart", {
             type: "pie",
             data: {
-                labels: [
-                    'YT',
-                    'ELSE',
-                ],
+                labels: r[1],
                 datasets: [{
                     label: "Today's BrowsingTime",
-                    data: BTdataForDraw,
-                    backgroundColor: [
-                        'rgb(255, 99, 132)',
-                        'rgb(54, 162, 235)',
-                    ],
+                    data: [0],
+                    backgroundColor: r[2],
                     hoverOffset: 4
                 }]
             },
@@ -42,7 +52,7 @@ function initChart() {
         });
     });
     chrome.storage.local.get(["aWeek"]).then((result) => {
-        let aWeek = result.aWeek[result.aWeek.length - 1 + WeekCount]
+        aWeek = result.aWeek[result.aWeek.length - 1 + WeekCount]
         let aWeekBTdataForDraw = CaWeekBT(aWeek)
         aWeekBrowsingTimenew = new Chart("myChart2", {
             type: 'bar',
@@ -93,6 +103,22 @@ function initChart() {
                             return tooltipItem.yLabel + "hr";
                         }
                     }
+                },
+                hover: {
+                    onHover: (event, chartElement) => {
+                        // if (chartElement.length == 0) {
+                        //     return
+                        // }
+                        // const index = chartElement[0]. _index;
+                        // console.log(index,chartElement)
+                    }
+                },
+                onClick: (event, chartElement) => {
+                    if (chartElement.length == 0) {
+                        return
+                    }
+                    const index = chartElement[0]._index;
+                    pastDay(index)
                 }
             }
         })
@@ -101,15 +127,17 @@ function initChart() {
 function UpDataImg() {
     chrome.storage.local.get(["AllBrowsingTime"]).then((result) => {
         let BrowsingTime = result.AllBrowsingTime.BrowsingTime
-        let BTdataForDraw = calculationBT(BrowsingTime)
-        TodayBrowsingTimenew.data.datasets[0].data = BTdataForDraw;
+        const r = calculationBT(BrowsingTime)
+        TodayBrowsingTimenew.data.datasets[0].data = r[0];
+        TodayBrowsingTimenew.data.labels = r[1];
+        TodayBrowsingTimenew.data.datasets[0].backgroundColor = r[2];
         TodayBrowsingTimenew.update();
     })
     chrome.storage.local.get(["aWeek"]).then((result) => {
         if (result.aWeek.length - 1 + WeekCount < 0) {
             return
         }
-        let aWeek = result.aWeek[result.aWeek.length - 1 + WeekCount]
+        aWeek = result.aWeek[result.aWeek.length - 1 + WeekCount]
         let aWeekBTdataForDraw = CaWeekBT(aWeek)
         aWeekBrowsingTimenew.data.datasets[0].data = aWeekBTdataForDraw[0];
         aWeekBrowsingTimenew.options.tooltips.callbacks.title = (tooltipItem) => {
@@ -118,23 +146,28 @@ function UpDataImg() {
         aWeekBrowsingTimenew.update();
     })
 }
+function pastDay(i) {
+    const r = calculationBT(aWeek[i].BrowsingTime)
+    TodayBrowsingTimenew.data.datasets[0].data = r[0];
+    TodayBrowsingTimenew.data.labels = r[1];
+    TodayBrowsingTimenew.data.datasets[0].backgroundColor = r[2];
+    TodayBrowsingTimenew.update();
+}
+
 
 function calculationBT(BrowsingTime) {
-    let YTtime = 0
-    let elseTime = 0
+    let AllTime = []
+    let AllLabels = []
+    let colors = []
     TodayTotal = 0
     for (let key in BrowsingTime) {
         TodayTotal += BrowsingTime[key]
-        if (key == "www.youtube.com") {
-            YTtime += BrowsingTime[key];
-        } else {
-            elseTime += BrowsingTime[key];
-        }
-
+        AllLabels.push(key)
+        colors.push(getColorByTag(key))
+        AllTime.push((BrowsingTime[key] / 60000).toFixed(2))
     }
-    YTtime = (YTtime / 60000).toFixed(2)
-    elseTime = (elseTime / 60000).toFixed(2)
-    return [YTtime, elseTime]
+
+    return [AllTime, AllLabels, colors]
 }
 function CaWeekBT(data) {
     let totals = []
@@ -162,7 +195,8 @@ function CaWeekBT(data) {
     return [totals, titles]
 
 }
-
+const ToToday = document.querySelector('#today')
+ToToday.addEventListener("click",UpDataImg)
 initChart()
 setTimeout(() => {
     UpDataImg()

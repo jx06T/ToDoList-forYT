@@ -39,7 +39,7 @@
             "content.js"
          ],
          "css": [
-            "content.css"
+            "content.css"  
          ],
          "matches": [
             "https://*/*",

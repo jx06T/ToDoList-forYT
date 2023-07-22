@@ -1,12 +1,35 @@
 // 進入網站的時間戳
 let moveCount = 0;
 let loop
-let Mytag = GetTag()
+let Mytag
+GetTag() 
 let IamKing = false
 let IamSKing = false
-function GetTag() {
-    const Myhostname = location.hostname
-    return Myhostname
+
+async function GetTag() {
+    const r1 = await chrome.storage.local.get("AllRule");
+    const AllRule = r1.AllRule;
+    // const Myhostname = location.hostname
+    const Myhostname = location.href
+    const MyTitle = document.querySelector("title").innerText
+    for (let i = 0; i < AllRule.length; i++) {
+        const aTag = AllRule[i];
+        if (aTag.deactivate) {
+            continue
+        }
+        for (let j = 0; j < aTag.rule.length; j++) {
+            const aRule = RegExp("^" + aTag.rule[j] + "$")
+            if (aRule.test(Myhostname)) {
+                Mytag = aTag.tag
+                return
+            }
+            if (aRule.test(MyTitle)) {
+                Mytag = aTag.tag
+                return
+            }
+        }
+    }
+    Mytag = "ELSE"
 }
 
 async function Onfocus() {
@@ -114,3 +137,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 })
 Onfocus()
+setTimeout(() => {
+    console.log( Mytag)
+}, 1000);

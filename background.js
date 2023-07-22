@@ -2,23 +2,26 @@ function ResetData() {
 	let today = new Date()
 	chrome.storage.local.set({ AllBrowsingTime: { Date: [GetMyDay(today), today.getDay()], BrowsingTime: {} } })
 	chrome.storage.local.set({ LastUpDataTime: today.getDate() })
-	chrome.storage.local.set({ aWeek: [] })
+	chrome.storage.local.set({ aWeek: [{}] })
+	chrome.storage.local.set({
+		AllRule: [{ tag: "YT", rule: ["https://www.youtube.com/"], color: "#ff0000" }, { tag: "ChatGPT", rule: ["https://chat.openai.com/"], color: "#78afa1", deactivate: true }]
+	})
 }
 
 async function UpData() {
 	let today = new Date();
 	const r1 = await chrome.storage.local.get("LastUpDataTime")
-	const LastUpDataTime = r1.LastUpDataTime
+	let LastUpDataTime = r1.LastUpDataTime
+	if (LastUpDataTime == undefined) {
+		ResetData()
+		return
+	}
 	if (LastUpDataTime != GetMyDay(today)) {
 		console.log("!")
 		const r2 = await chrome.storage.local.get("AllBrowsingTime");
 		const LBrowsingTime = r2.AllBrowsingTime;
 		const r3 = await chrome.storage.local.get("aWeek");
 		let aWeek = r3.aWeek;
-		if (aWeek == undefined) {
-			ResetData()
-			aWeek = []
-		}
 		chrome.storage.local.set({ AllBrowsingTime: { Date: [GetMyDay(today), today.getDay()], BrowsingTime: {} } })
 		if (today.getDay() == 0) {
 			if (aWeek.length > 3) {
@@ -46,10 +49,11 @@ function GetMyDay(today) {
 
 chrome.runtime.onStartup.addListener(() => {
 	UpData()
-	// chrome.tabs.create({ url: "https://news.google.com/home?hl=zh-TW&gl=TW&ceid=TW:zh-Hant" });
+	chrome.tabs.create({ url: "https://news.google.com/home?hl=zh-TW&gl=TW&ceid=TW:zh-Hant" });
 });
 chrome.runtime.onInstalled.addListener(() => {
 	UpData()
+	// chrome.tabs.create({ url: "extension://epoagflebjghjoehflcmddeabilfgaph/options.html#rules" });
 })
 
 //------------------------------------------------------------------------------------------------------------------------
@@ -62,7 +66,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	// console.log(A)
 	switch (A) {
 		case "test":
-			// console.log("!!!!!", sender, request.TestText)
+			console.log("!!!!!", sender, request.TestText)
 			break
 		case "AmIKing":
 			if (FirstKing.id == null) {
@@ -157,14 +161,22 @@ function AddTime(tag) {
 
 function DeBugResetData() {
 	let today = new Date()
-	// chrome.storage.local.set({ AllBrowsingTime: { Date: ["07/16", 6], BrowsingTime: { T1: 12 * 3600000 } } })
+	// chrome.storage.local.set({ AllBrowsingTime: { Date: ["07/22", 6], BrowsingTime: {} } })
 	// chrome.storage.local.set({ AllBrowsingTime: { Date: [GetMyDay(today), today.getDay()], BrowsingTime: {} } })
-	chrome.storage.local.set({ LastUpDataTime: "07/16" })
+	// chrome.storage.local.set({ LastUpDataTime: "07/16" })
 	// chrome.storage.local.set({ LastUpDataTime: GetMyDay(today) })
-	return
+	// return
 	chrome.storage.local.set({
 		aWeek:
 			[{
+				0: { Date: "06/02", BrowsingTime: { T1: 7 * 3600000 } },
+				1: { Date: "06/03", BrowsingTime: { T1: 2 * 3600000 } },
+				2: { Date: "06/04", BrowsingTime: { T1: 4 * 3600000 } },
+				3: { Date: "06/05", BrowsingTime: { T1: 1 * 3600000 } },
+				4: { Date: "06/06", BrowsingTime: { T1: 9 * 3600000 } },
+				5: { Date: "06/07", BrowsingTime: { T1: 3 * 3600000 } },
+				6: { Date: "06/08", BrowsingTime: { T1: 5 * 3600000 } },
+			}, {
 				0: { Date: "06/02", BrowsingTime: { T1: 7 * 3600000 } },
 				1: { Date: "06/03", BrowsingTime: { T1: 2 * 3600000 } },
 				2: { Date: "06/04", BrowsingTime: { T1: 4 * 3600000 } },
@@ -187,11 +199,9 @@ function DeBugResetData() {
 				2: { Date: "07/11", BrowsingTime: { T1: 3 * 3600000 } },
 				3: { Date: "07/12", BrowsingTime: { T1: 4 * 3600000 } },
 				4: { Date: "07/13", BrowsingTime: { T1: 5 * 3600000 } },
-				5: { Date: "07/14", BrowsingTime: { T1: 1000000 } },
-				6: { Date: "07/15", BrowsingTime: { T1: 12 * 3600000 } },
+				5: { Date: "07/14", BrowsingTime: { T1: 6 * 3600000 } },
+				6: { Date: null, BrowsingTime: null },
 			},
-			{
-				0: { Date: "07/16", BrowsingTime: { T1: 12 * 3600000 } },
-			}]
+			]
 	})
 }

@@ -30,3 +30,11 @@
 hr {
     margin: 20px;
 }
+#today{
+    position: fixed;
+    margin-top: -390px;
+    margin-left: 20px;
+    font-size: 14px;
+    text-decoration:underline;
+    cursor: pointer;
+}

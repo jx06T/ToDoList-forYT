@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="options.css">
     <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
-    <script src="https://kit.fontawesome.com/4ba6c6293c.js" crossorigin="anonymous"></script>
-    <title>設定頁面</title>
+    <title>ToDoList-forYT</title>
 
 
 </head>
@@ -17,16 +16,20 @@
     <div id="sidebar">
         <ul>
             <li class="menu">
-                <a href="#" class="active" data-page="welcome">
-                    <i class="fa-solid fa-house menu"></i>
-                    <span class="Stext">歡迎頁面</span>
-                </a>
+                <div class="menu " data-page="welcome">
+                    <img class="Icon" src="images\house.svg" alt="welcome">
+                    <a href="#welcome" class="Stext">
+                        歡迎頁面
+                    </a>
+                </div>
             </li>
             <li class="menu">
-                <a href="#" data-page="rules">
-                    <i class="fa-solid fa-tags menu"></i>
-                    <span class="Stext">規則設定</span>
-                </a>
+                <div class="menu" data-page="rules">
+                    <img class="Icon" src="images\tags.svg" alt="rules">
+                    <a href="#rules" class="Stext">
+                        規則設定
+                    </a>
+                </div>
             </li>
         </ul>
     </div>
@@ -34,16 +37,32 @@
     <div id="main">
 
         <div class="page active" id="welcome">
-            歡迎頁面內容
+            <h1>歡迎</h1>
         </div>
 
         <div class="page" id="rules">
-            規則設定頁面內容
+            <h1>設定頁面</h1>
+            <table id="Rules">
+
+                <tr>
+                    <th style="width:30%">Tag</th>
+                    <th>Rule</th>
+                </tr>
+
+
+            </table>
+            <div class="btn-column">
+                <button id="DaRow">x</button>
+                <button id="Drag">≡</button>
+                <button id="Deactivate">–</button>
+                <input type="color"  id="colorPicker">
+            </div>
         </div>
 
     </div>
 
     <script src="options.js"></script>
+    <script src="Tags.js"></script>
 
 </body>
 
