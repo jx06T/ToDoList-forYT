@@ -4,11 +4,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="options.css">
+    <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
+    <script src="https://kit.fontawesome.com/4ba6c6293c.js" crossorigin="anonymous"></script>
+    <title>設定頁面</title>
+
+
 </head>
 
 <body>
-    
+
+    <div id="sidebar">
+        <ul>
+            <li class="menu">
+                <a href="#" class="active" data-page="welcome">
+                    <i class="fa-solid fa-house menu"></i>
+                    <span class="Stext">歡迎頁面</span>
+                </a>
+            </li>
+            <li class="menu">
+                <a href="#" data-page="rules">
+                    <i class="fa-solid fa-tags menu"></i>
+                    <span class="Stext">規則設定</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div id="main">
+
+        <div class="page active" id="welcome">
+            歡迎頁面內容
+        </div>
+
+        <div class="page" id="rules">
+            規則設定頁面內容
+        </div>
+
+    </div>
+
+    <script src="options.js"></script>
+
 </body>
 
 </html>

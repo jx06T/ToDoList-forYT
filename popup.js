@@ -26,6 +26,17 @@ function initChart() {
                 title: {
                     display: true,
                     text: "Today's BrowsingTime"
+                },
+                tooltips: {
+                    callbacks: {
+                        title: function (tooltipItem, data) {
+                            return data.labels[tooltipItem[0].index];
+                        },
+                        label: function (tooltipItem, data) {
+                            const dataset = data.datasets[tooltipItem.datasetIndex];
+                            return dataset.data[tooltipItem.index] + "min";
+                        }
+                    }
                 }
             }
         });
@@ -137,7 +148,7 @@ function CaWeekBT(data) {
         }
         aDay = data[key]
         if (aDay.BrowsingTime == null) {
-            totals.push((TodayTotal / 60000).toFixed(2))
+            totals.push((TodayTotal / 3600000).toFixed(2))
             titles.push(aDay.Date)
             continue
         }

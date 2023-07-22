@@ -1,97 +1,81 @@
 // 進入網站的時間戳
-let enterTime = 0;
 let moveCount = 0;
 let loop
-let tag = GetTag()
-let InotKing = false
+let Mytag = GetTag()
 let IamKing = false
-let first = true
+let IamSKing = false
 function GetTag() {
     const Myhostname = location.hostname
     return Myhostname
 }
 
-function Onfocus() {
-    if (IamKing) {
-        IamKing = false
-        chrome.runtime.sendMessage({ action: "NotKing" })
-    } else {
-        chrome.runtime.sendMessage({ action: "Onfocus" })
+async function Onfocus() {
+    await chrome.runtime.sendMessage({ action: "isKingReallyKing" })
+    let r = await chrome.runtime.sendMessage({ action: "AmIReallyKing" })
+    if (r.msg != IamKing) {
+        IamKing = r.msg
     }
-
-    enterTime = performance.now(); // 記錄進入網站的時間戳
-    document.addEventListener('wheel', () => { handleMouseMove(10) });
-    document.addEventListener('mousemove', () => { handleMouseMove(1) });
-    moveCount = 0;
-    if (loop) {
-        Onblur()
-    }
-    loop = setInterval(() => {
-        console.log(InotKing, moveCount)
-        chrome.runtime.sendMessage({ action: "GetKingTag" }).then((r) => {
-            if (first || r.KingTag != null) {
-                if (moveCount < 150) {
-                    if (first) {
-                        if (!isPlayingVideo()) {
-                            first = false
-                            Onblur()
-                            return
-                        }
+    // console.log("!!!!!", IamKing, IamSKing)
+    if (!IamKing) {
+        chrome.runtime.sendMessage({ action: "AmIKing", tag: Mytag }).then((r) => {
+            if (r.msg) {
+                IamKing = true
+            } else {
+                moveCount = 0;
+                document.addEventListener('wheel', () => { handleMouseMove(10) });
+                document.addEventListener('mousemove', () => { handleMouseMove(1) });
+                loop = setInterval(() => {
+                    // console.log(IamSKing)
+                    if (!IamSKing && (moveCount > 80 || isPlayingVideo())) {
+                        chrome.runtime.sendMessage({ action: "IAmReallyKing", tag: Mytag }).then((r) => {
+                        })
+                        IamSKing = true
+                    } else if (IamSKing && moveCount < 80) {
+                        chrome.runtime.sendMessage({ action: "IAmNotReallyKing", tag: Mytag }).then((r) => {
+                        })
+                        IamSKing = false
                     }
-                    if (!InotKing) {
-                        UpData(tag)
-                        InotKing = true
-                    }
-                } else {
-                    if (InotKing) {
-                        UpData(r.KingTag)
-                        InotKing = false
-                    }
-                }
+                    moveCount = 0;
+                }, 4000);
             }
         })
-        moveCount = 0;
-    }, 5000);
+    }
 }
 
-function Onblur() {
-    if (InotKing) {
-        chrome.runtime.sendMessage({ action: "GetKingTag" }).then((r) => {
-            if (r.KingTag != null) {
-                UpData(r.KingTag)
-            } else {
-                UpData(tag)
-            }
-        })
-        InotKing = false
+async function Onblur() {
+    const r = await chrome.runtime.sendMessage({ action: "ChecckPlaying" })
+    const isActive = r.msg
+    // console.log("?????", IamKing, IamSKing)
+    if (IamKing) {
+        if (!isPlayingVideo() || !isActive) {
+            chrome.runtime.sendMessage({ action: "KingDown", tag: Mytag }).then((r) => {
+            })
+            IamKing = false
+        }
     } else {
-        UpData(tag)
+        if (isPlayingVideo() && isActive) {
+            chrome.runtime.sendMessage({ action: "KillKing", tag: Mytag }).then((r) => {
+            })
+            IamSKing = false
+            IamKing = true
+        } else {
+            chrome.runtime.sendMessage({ action: "SKingDown", tag: Mytag }).then((r) => {
+            })
+            IamSKing = false
+        }
     }
     clearInterval(loop);
     loop = undefined
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('wheel', handleMouseMove);
-
-}
-
-function UpData(tag) {
-    const browsingTime = performance.now() - enterTime; // 計算瀏覽時間
-    console.log(tag)
-    chrome.storage.local.get(["AllBrowsingTime"]).then((result) => {
-        let OldAllBrowsingTime = result.AllBrowsingTime
-        OldAllBrowsingTime.BrowsingTime[tag] = OldAllBrowsingTime.BrowsingTime[tag] ? OldAllBrowsingTime.BrowsingTime[tag] += browsingTime : browsingTime
-        console.log(OldAllBrowsingTime)
-        chrome.storage.local.set({ AllBrowsingTime: OldAllBrowsingTime })
-    });
-    enterTime = performance.now();
 }
 
 function handleMouseMove(t) {
     moveCount += t;
 }
 
-const videos = document.querySelectorAll("video")
 function isPlayingVideo() {
+    const videos = document.querySelectorAll("video")
     let isPlay = false
     videos.forEach((video) => {
         isPlay = !video.paused || isPlay
@@ -102,18 +86,17 @@ function isPlayingVideo() {
 
 window.addEventListener('blur', () => {
     Onblur()
-    if (isPlayingVideo()) {
-        chrome.runtime.sendMessage({ action: "isKing", tag: tag }).then((r) => {
-            IamKing = r.isKing
-        })
-    }
 });
 
 window.addEventListener('beforeunload', () => {
-    Onblur()
     if (IamKing) {
+        chrome.runtime.sendMessage({ action: "KingDown", tag: Mytag }).then((r) => {
+        })
         IamKing = false
-        chrome.runtime.sendMessage({ action: "NotKing" })
+    } else {
+        chrome.runtime.sendMessage({ action: "SKingDown", tag: Mytag }).then((r) => {
+        })
+        IamSKing = false
     }
 });
 
@@ -121,4 +104,13 @@ window.addEventListener('focus', () => {
     Onfocus()
 });
 
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    let A = request.action
+    switch (A) {
+        case "YouNotAreKing":
+            IamKing = false
+            IamSKing = false
+            break;
+    }
+})
 Onfocus()
