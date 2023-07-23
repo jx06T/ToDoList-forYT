@@ -49,7 +49,7 @@ function GetMyDay(today) {
 
 chrome.runtime.onStartup.addListener(() => {
 	UpData()
-	chrome.tabs.create({ url: "https://news.google.com/home?hl=zh-TW&gl=TW&ceid=TW:zh-Hant" });
+	// chrome.tabs.create({ url: "https://news.google.com/home?hl=zh-TW&gl=TW&ceid=TW:zh-Hant" });
 });
 chrome.runtime.onInstalled.addListener(() => {
 	UpData()
@@ -176,14 +176,6 @@ function DeBugResetData() {
 				4: { Date: "06/06", BrowsingTime: { T1: 9 * 3600000 } },
 				5: { Date: "06/07", BrowsingTime: { T1: 3 * 3600000 } },
 				6: { Date: "06/08", BrowsingTime: { T1: 5 * 3600000 } },
-			}, {
-				0: { Date: "06/02", BrowsingTime: { T1: 7 * 3600000 } },
-				1: { Date: "06/03", BrowsingTime: { T1: 2 * 3600000 } },
-				2: { Date: "06/04", BrowsingTime: { T1: 4 * 3600000 } },
-				3: { Date: "06/05", BrowsingTime: { T1: 1 * 3600000 } },
-				4: { Date: "06/06", BrowsingTime: { T1: 9 * 3600000 } },
-				5: { Date: "06/07", BrowsingTime: { T1: 3 * 3600000 } },
-				6: { Date: "06/08", BrowsingTime: { T1: 5 * 3600000 } },
 			},
 			{
 				0: { Date: "07/02", BrowsingTime: { T1: 7 * 3600000 } },
@@ -200,7 +192,9 @@ function DeBugResetData() {
 				3: { Date: "07/12", BrowsingTime: { T1: 4 * 3600000 } },
 				4: { Date: "07/13", BrowsingTime: { T1: 5 * 3600000 } },
 				5: { Date: "07/14", BrowsingTime: { T1: 6 * 3600000 } },
-				6: { Date: null, BrowsingTime: null },
+				6: { Date: "07/15", BrowsingTime: { T1: 7 * 3600000 } },
+			}, {
+				0: { Date: "07/23", BrowsingTime: null },
 			},
 			]
 	})

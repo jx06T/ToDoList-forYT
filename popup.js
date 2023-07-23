@@ -1,3 +1,5 @@
+const ToToday = document.querySelector('#today')
+ToToday.addEventListener("click", UpDataImg)
 let TodayBrowsingTimenew
 let aWeekBrowsingTimenew
 let aWeek
@@ -20,7 +22,7 @@ function getColorByTag(tag) {
 function initChart() {
     chrome.storage.local.get(["AllBrowsingTime"]).then((result) => {
         let BrowsingTime = result.AllBrowsingTime.BrowsingTime
-        const r = calculationBT(BrowsingTime)
+        const r = calculationBT(BrowsingTime, 1)
         TodayBrowsingTimenew = new Chart("myChart", {
             type: "pie",
             data: {
@@ -124,30 +126,40 @@ function initChart() {
         })
     });
 }
-function UpDataImg() {
-    chrome.storage.local.get(["AllBrowsingTime"]).then((result) => {
-        let BrowsingTime = result.AllBrowsingTime.BrowsingTime
-        const r = calculationBT(BrowsingTime)
-        TodayBrowsingTimenew.data.datasets[0].data = r[0];
-        TodayBrowsingTimenew.data.labels = r[1];
-        TodayBrowsingTimenew.data.datasets[0].backgroundColor = r[2];
-        TodayBrowsingTimenew.update();
-    })
-    chrome.storage.local.get(["aWeek"]).then((result) => {
-        if (result.aWeek.length - 1 + WeekCount < 0) {
-            return
-        }
-        aWeek = result.aWeek[result.aWeek.length - 1 + WeekCount]
-        let aWeekBTdataForDraw = CaWeekBT(aWeek)
-        aWeekBrowsingTimenew.data.datasets[0].data = aWeekBTdataForDraw[0];
-        aWeekBrowsingTimenew.options.tooltips.callbacks.title = (tooltipItem) => {
-            return aWeekBTdataForDraw[1][tooltipItem[0].index]
-        };
-        aWeekBrowsingTimenew.update();
-    })
+function UpDataImg(type = 0) {
+    if (type == 0) {
+        chrome.storage.local.get(["AllBrowsingTime"]).then((result) => {
+            let BrowsingTime = result.AllBrowsingTime.BrowsingTime
+            const r = calculationBT(BrowsingTime, 1)
+            TodayBrowsingTimenew.data.datasets[0].data = r[0];
+            TodayBrowsingTimenew.data.labels = r[1];
+            TodayBrowsingTimenew.data.datasets[0].backgroundColor = r[2];
+            TodayBrowsingTimenew.update();
+        })
+    } else {
+        chrome.storage.local.get(["aWeek"]).then((result) => {
+            if (result.aWeek.length - 1 + WeekCount < 0) {
+                return
+            }
+            aWeek = result.aWeek[result.aWeek.length - 1 + WeekCount]
+            let aWeekBTdataForDraw = CaWeekBT(aWeek)
+            aWeekBrowsingTimenew.data.datasets[0].data = aWeekBTdataForDraw[0];
+            aWeekBrowsingTimenew.options.tooltips.callbacks.title = (tooltipItem) => {
+                return aWeekBTdataForDraw[1][tooltipItem[0].index]
+            };
+            aWeekBrowsingTimenew.update();
+        })
+    }
 }
 function pastDay(i) {
     const r = calculationBT(aWeek[i].BrowsingTime)
+    console.log(r)
+    if (r[0].length == 0) {
+        ToToday.style.visibility = "hidden"
+        UpDataImg(0)
+        return
+    }
+    ToToday.style.visibility = "visible"
     TodayBrowsingTimenew.data.datasets[0].data = r[0];
     TodayBrowsingTimenew.data.labels = r[1];
     TodayBrowsingTimenew.data.datasets[0].backgroundColor = r[2];
@@ -155,13 +167,17 @@ function pastDay(i) {
 }
 
 
-function calculationBT(BrowsingTime) {
+function calculationBT(BrowsingTime, t = 0) {
     let AllTime = []
     let AllLabels = []
     let colors = []
-    TodayTotal = 0
+    if (t == 1) {
+        TodayTotal = 0
+    }
     for (let key in BrowsingTime) {
-        TodayTotal += BrowsingTime[key]
+        if (t == 1) {
+            TodayTotal += BrowsingTime[key]
+        }
         AllLabels.push(key)
         colors.push(getColorByTag(key))
         AllTime.push((BrowsingTime[key] / 60000).toFixed(2))
@@ -195,26 +211,30 @@ function CaWeekBT(data) {
     return [totals, titles]
 
 }
-const ToToday = document.querySelector('#today')
-ToToday.addEventListener("click", UpDataImg)
 initChart()
 setTimeout(() => {
-    UpDataImg()
+    UpDataImg(0)
+    UpDataImg(1)
 }, 100);
 // chrome.storage.local.get(["aWeek"]).then((result) => {
 // });
+
+ToToday.addEventListener("click", () => {
+    UpDataImg(0)
+    ToToday.style.visibility = "hidden"
+})
 let WeekCount = 0
 const NextWeek = document.getElementById("nextWeek")
 NextWeek.addEventListener("click", () => {
     if (WeekCount < 0) {
         WeekCount++
-        UpDataImg()
+        UpDataImg(1)
     }
 })
 const LastWeek = document.getElementById("lastWeek")
 LastWeek.addEventListener("click", () => {
     if (WeekCount > -4) {
         WeekCount--
-        UpDataImg()
+        UpDataImg(1)
     }
 })
