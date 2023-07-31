@@ -1,17 +1,16 @@
-// 進入網站的時間戳
-let moveCount = 0;
-let loop
-let Mytag
-GetTag() 
-let IamKing = false
-let IamSKing = false
 
+const TitleT = document.querySelector("title")
+let Mytag
+GetTag()
+
+let isOnFocus = true
+let moveCount = 0;
+let MovementCount = 0
 async function GetTag() {
-    const r1 = await chrome.storage.local.get("AllRule");
-    const AllRule = r1.AllRule;
-    // const Myhostname = location.hostname
+    const title = TitleT.innerText
     const Myhostname = location.href
-    const MyTitle = document.querySelector("title").innerText
+    const r = await chrome.storage.local.get("AllRule");
+    const AllRule = r.AllRule;
     for (let i = 0; i < AllRule.length; i++) {
         const aTag = AllRule[i];
         if (aTag.deactivate) {
@@ -23,7 +22,7 @@ async function GetTag() {
                 Mytag = aTag.tag
                 return
             }
-            if (aRule.test(MyTitle)) {
+            if (aRule.test(title)) {
                 Mytag = aTag.tag
                 return
             }
@@ -32,65 +31,31 @@ async function GetTag() {
     Mytag = "ELSE"
 }
 
-async function Onfocus() {
-    await chrome.runtime.sendMessage({ action: "isKingReallyKing" })
-    let r = await chrome.runtime.sendMessage({ action: "AmIReallyKing" })
-    if (r.msg != IamKing) {
-        IamKing = r.msg
-    }
-    // console.log("!!!!!", IamKing, IamSKing)
-    if (!IamKing) {
-        chrome.runtime.sendMessage({ action: "AmIKing", tag: Mytag }).then((r) => {
-            if (r.msg) {
-                IamKing = true
-            } else {
-                moveCount = 0;
-                document.addEventListener('wheel', () => { handleMouseMove(10) });
-                document.addEventListener('mousemove', () => { handleMouseMove(1) });
-                loop = setInterval(() => {
-                    // console.log(IamSKing)
-                    if (!IamSKing && (moveCount > 80 || isPlayingVideo())) {
-                        chrome.runtime.sendMessage({ action: "IAmReallyKing", tag: Mytag }).then((r) => {
-                        })
-                        IamSKing = true
-                    } else if (IamSKing && moveCount < 80) {
-                        chrome.runtime.sendMessage({ action: "IAmNotReallyKing", tag: Mytag }).then((r) => {
-                        })
-                        IamSKing = false
-                    }
-                    moveCount = 0;
-                }, 4000);
-            }
-        })
-    }
+document.addEventListener('wheel', () => {
+    handleMouseMove(10)
+});
+document.addEventListener('mousemove', () => {
+    handleMouseMove(1)
+});
+
+window.addEventListener('blur', () => {
+    Onblur()
+});
+
+window.addEventListener('beforeunload', () => {
+    chrome.runtime.sendMessage({ action: "Turned_off" })
+});
+
+window.addEventListener('focus', () => {
+    Onfocus()
+});
+
+function Onfocus() {
+    isOnFocus = true
 }
 
-async function Onblur() {
-    const r = await chrome.runtime.sendMessage({ action: "ChecckPlaying" })
-    const isActive = r.msg
-    // console.log("?????", IamKing, IamSKing)
-    if (IamKing) {
-        if (!isPlayingVideo() || !isActive) {
-            chrome.runtime.sendMessage({ action: "KingDown", tag: Mytag }).then((r) => {
-            })
-            IamKing = false
-        }
-    } else {
-        if (isPlayingVideo() && isActive) {
-            chrome.runtime.sendMessage({ action: "KillKing", tag: Mytag }).then((r) => {
-            })
-            IamSKing = false
-            IamKing = true
-        } else {
-            chrome.runtime.sendMessage({ action: "SKingDown", tag: Mytag }).then((r) => {
-            })
-            IamSKing = false
-        }
-    }
-    clearInterval(loop);
-    loop = undefined
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('wheel', handleMouseMove);
+function Onblur() {
+    isOnFocus = false
 }
 
 function handleMouseMove(t) {
@@ -106,37 +71,55 @@ function isPlayingVideo() {
     return isPlay
 }
 
-
-window.addEventListener('blur', () => {
-    Onblur()
-});
-
-window.addEventListener('beforeunload', () => {
-    if (IamKing) {
-        chrome.runtime.sendMessage({ action: "KingDown", tag: Mytag }).then((r) => {
-        })
-        IamKing = false
-    } else {
-        chrome.runtime.sendMessage({ action: "SKingDown", tag: Mytag }).then((r) => {
-        })
-        IamSKing = false
+function isMouseMove() {
+    let isMouseMovee = false
+    if (moveCount > 40 || MovementCount > 30) {
+        isOnFocus = true
+        MovementCount = 0
     }
-});
+    if (moveCount > 90) {
+        isMouseMovee = true
 
-window.addEventListener('focus', () => {
-    Onfocus()
-});
+    } else {
+        isMouseMovee = false
+    }
+    moveCount = 0
+    return isMouseMovee
+}
+
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     let A = request.action
     switch (A) {
-        case "YouNotAreKing":
-            IamKing = false
-            IamSKing = false
-            break;
+        case "CheckYou":
+            let isPlayingVideoo = isPlayingVideo()
+            let isMouseMoveo = isMouseMove()
+            if (!request.isSomeonePlayVideo) {
+                if (isPlayingVideoo || isOnFocus || isMouseMoveo) {
+                    chrome.runtime.sendMessage({ action: "Alive", tag: Mytag, isSomeonePlayVideo: isPlayingVideoo })
+                    console.log("!")
+                    if (!isPlayingVideoo && !isMouseMoveo) {
+                        MovementCount++
+                    }
+                }
+            } else {
+                if (isOnFocus && isMouseMoveo) {
+                    chrome.runtime.sendMessage({ action: "Alive", tag: Mytag, isSomeonePlayVideo: isPlayingVideoo })
+                    console.log("!")
+                } else if (isOnFocus && isPlayingVideoo) {
+                    chrome.runtime.sendMessage({ action: "Alive", tag: Mytag, isSomeonePlayVideo: isPlayingVideoo })
+                    console.log("!")
+                } else if (isPlayingVideoo) {
+                    setTimeout(() => {
+                        chrome.runtime.sendMessage({ action: "Alive", tag: Mytag, isSomeonePlayVideo: isPlayingVideoo })
+                    }, 10);
+                } else if (isOnFocus && !isPlayingVideoo && !isMouseMoveo) {
+                    MovementCount++
+                }
+            }
+            if (MovementCount > 30) {
+                isOnFocus = false
+            }
     }
 })
-Onfocus()
-setTimeout(() => {
-    console.log( Mytag)
-}, 1000);
+chrome.runtime.sendMessage({ action: "Add_url" })

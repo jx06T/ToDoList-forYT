@@ -20,7 +20,8 @@
       "tabs",
       "scrispting",
       "activeTab",
-      "storage"
+      "storage",
+      "alarms"
    ],
    "host_permissions": [
       "https://app.simplenote.com/publish/*",
@@ -39,7 +40,7 @@
             "content.js"
          ],
          "css": [
-            "content.css"  
+            "content.css"
          ],
          "matches": [
             "https://*/*",

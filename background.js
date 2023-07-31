@@ -1,7 +1,7 @@
-function ResetData() {
+function InitData() {
 	let today = new Date()
 	chrome.storage.local.set({ AllBrowsingTime: { Date: [GetMyDay(today), today.getDay()], BrowsingTime: {} } })
-	chrome.storage.local.set({ LastUpDataTime: today.getDate() })
+	chrome.storage.local.set({ LastUpDataTime: [GetMyDay(today), today.getDay()] })
 	chrome.storage.local.set({ aWeek: [{}] })
 	chrome.storage.local.set({
 		AllRule: [{ tag: "YT", rule: ["https://www.youtube.com/"], color: "#ff0000" }, { tag: "ChatGPT", rule: ["https://chat.openai.com/"], color: "#78afa1", deactivate: true }]
@@ -13,17 +13,18 @@ async function UpData() {
 	const r1 = await chrome.storage.local.get("LastUpDataTime")
 	let LastUpDataTime = r1.LastUpDataTime
 	if (LastUpDataTime == undefined) {
-		ResetData()
+		InitData()
 		return
 	}
-	if (LastUpDataTime != GetMyDay(today)) {
-		console.log("!")
+	if (LastUpDataTime[0] != GetMyDay(today)) {
+
 		const r2 = await chrome.storage.local.get("AllBrowsingTime");
 		const LBrowsingTime = r2.AllBrowsingTime;
+
 		const r3 = await chrome.storage.local.get("aWeek");
 		let aWeek = r3.aWeek;
-		chrome.storage.local.set({ AllBrowsingTime: { Date: [GetMyDay(today), today.getDay()], BrowsingTime: {} } })
-		if (today.getDay() == 0) {
+
+		if (parseInt(GetMyDay(today).slice(3, 5)) - parseInt(LastUpDataTime[0].slice(3, 5)) > (6 - LastUpDataTime[1])) {
 			if (aWeek.length > 3) {
 				aWeek.shift()
 			}
@@ -31,10 +32,10 @@ async function UpData() {
 		}
 		aWeek[aWeek.length - 1][LBrowsingTime.Date[1]] = { Date: LBrowsingTime.Date[0], BrowsingTime: LBrowsingTime.BrowsingTime }
 		aWeek[aWeek.length - 1][today.getDay()] = { Date: GetMyDay(today), BrowsingTime: null }
-		chrome.storage.local.set({ aWeek: aWeek })
-		chrome.storage.local.set({ LastUpDataTime: GetMyDay(today) })
 
-		// console.log(aWeek)
+		chrome.storage.local.set({ aWeek: aWeek })
+		chrome.storage.local.set({ AllBrowsingTime: { Date: [GetMyDay(today), today.getDay()], BrowsingTime: {} } })
+		chrome.storage.local.set({ LastUpDataTime: [GetMyDay(today), today.getDay()] })
 	}
 }
 
@@ -49,7 +50,6 @@ function GetMyDay(today) {
 
 chrome.runtime.onStartup.addListener(() => {
 	UpData()
-	// chrome.tabs.create({ url: "https://news.google.com/home?hl=zh-TW&gl=TW&ceid=TW:zh-Hant" });
 });
 chrome.runtime.onInstalled.addListener(() => {
 	UpData()
@@ -57,88 +57,49 @@ chrome.runtime.onInstalled.addListener(() => {
 })
 
 //------------------------------------------------------------------------------------------------------------------------
-let FirstKing = { id: null, tag: null }//當前計算的
-let SecondKing = { id: null, tag: null }//有可能搶的
+let ActivePages = []
 let EnterTime = Date.now()
-let SFK = true
+let okId = []
+let SomeonePlayVideo = false
+let PlayVideo_Tab = undefined
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	let A = request.action
-	// console.log(A)
+	const TabId = sender.tab.id
 	switch (A) {
 		case "test":
 			console.log("!!!!!", sender, request.TestText)
 			break
-		case "AmIKing":
-			if (FirstKing.id == null) {
-				sendResponse({ msg: true })
-				FirstKing.tag = request.tag
-				FirstKing.id = sender.tab.id
-				EnterTime = Date.now()
-			} else {
-				sendResponse({ msg: false })
-				SecondKing.tag = request.tag
-				SecondKing.id = sender.tab.id
+		case "Turned_off":
+			if (PlayVideo_Tab == TabId) {
+				SomeonePlayVideo = false
+				PlayVideo_Tab = undefined
 			}
-			break
-		case "IAmReallyKing":
-			AddTime(SFK ? FirstKing.tag : SecondKing.tag)
-			SFK = false
-			break
-		case "IAmNotReallyKing":
-			AddTime(SFK ? FirstKing.tag : SecondKing.tag)
-			SFK = true
-			break
-		case "KingDown":
-			if (sender.tab.id != FirstKing.id) {
-				break
-			}
-			AddTime(SFK ? FirstKing.tag : SecondKing.tag)
-			FirstKing.tag = null
-			FirstKing.id = null
-			break
-		case "SKingDown":
-			AddTime(SFK ? FirstKing.tag : SecondKing.tag)
-			SecondKing.tag = null
-			SecondKing.id = null
-			SFK = true
-			break
-		case "KillKing":
-			AddTime(SFK ? FirstKing.tag : SecondKing.tag)
-			if (FirstKing.id != null) {
-				chrome.tabs.sendMessage(FirstKing.id, { action: "YouNotAreKing" });
-			}
-			SecondKing.tag = null
-			SecondKing.id = null
-			FirstKing.tag = request.tag
-			FirstKing.id = sender.tab.id
-			SFK = true
-			break
-		case "ChecckPlaying":
-			AddTime(SFK ? FirstKing.tag : SecondKing.tag)
-			let active = sender.tab.active
-			sendResponse({ msg: active })
-			break
-		case "isKingReallyKing":
-			if (FirstKing.id == null) {
-				sendResponse({ msg: "ok" })
-				break
-			}
-			chrome.tabs.get(FirstKing.id, (tab) => {
-				if (!tab.active) {
-					if (FirstKing.id != null) {
-						chrome.tabs.sendMessage(FirstKing.id, { action: "YouNotAreKing" });
-					}
-					FirstKing.tag = null
-					FirstKing.id = null
+			const WillOffPage = ActivePages.filter((item, index) => {
+				if (item.id === TabId) {
+					item.index = index;
+					return true;
 				}
-				sendResponse({ msg: "ok" })
-			})
+			});
+			if (WillOffPage) {
+				ActivePages.splice(WillOffPage.index, 1)
+			}
+			okId.splice(okId.indexOf(TabId), 1)
 			break
-		case "AmIReallyKing":
-			sendResponse({ msg: sender.tab.id == FirstKing.id })
+		case "Alive":
+			ActivePages.push({ id: TabId, tag: request.tag, tab: sender.tab })
+			if (request.isSomeonePlayVideo) {
+				SomeonePlayVideo = true
+				PlayVideo_Tab = TabId
+			} else if (PlayVideo_Tab == TabId) {
+				SomeonePlayVideo = false
+				PlayVideo_Tab = undefined
+			}
+			break
+		case "Add_url":
+			okId.push(TabId)
 			break
 	}
-	// console.log(sender.tab, SFK, FirstKing, SecondKing)
 	return true;
 });
 
@@ -146,24 +107,69 @@ function AddTime(tag) {
 	if (tag == null) {
 		return
 	}
-	// console.log(SFK, FirstKing, SecondKing)
 	let BrowsingTime = Date.now() - EnterTime
 	chrome.storage.local.get(["AllBrowsingTime"]).then((result) => {
 		let OldAllBrowsingTime = result.AllBrowsingTime
-		OldAllBrowsingTime.BrowsingTime[tag] = OldAllBrowsingTime.BrowsingTime[tag] ? OldAllBrowsingTime.BrowsingTime[tag] += BrowsingTime : BrowsingTime
-		// console.log(tag, BrowsingTime, OldAllBrowsingTime)
+		if (OldAllBrowsingTime.BrowsingTime[tag] == undefined) {
+			OldAllBrowsingTime.BrowsingTime[tag] = BrowsingTime
+		} else {
+			OldAllBrowsingTime.BrowsingTime[tag] = OldAllBrowsingTime.BrowsingTime[tag] += BrowsingTime
+		}
 		chrome.storage.local.set({ AllBrowsingTime: OldAllBrowsingTime })
 	})
 	EnterTime = Date.now()
 }
 
+function doTask() {
+	if (ActivePages.length > 0) {
+		console.log(ActivePages)
+		AddTime(ActivePages[0].tag)
+		console.log(ActivePages[0].tab.title)
+		ActivePages = []
+	}
+	if (SomeonePlayVideo) {
+		chrome.tabs.get(PlayVideo_Tab, (tab) => {
+			if (!tab) {
+				SomeonePlayVideo = false
+				PlayVideo_Tab = undefined
+				return
+			}
+			if (!tab.active) {
+				SomeonePlayVideo = false
+				PlayVideo_Tab = undefined
+			}
+		})
+	}
+	chrome.windows.getAll({ populate: true }, (windows) => {
+		windows.forEach((window) => {
+			if (window.state !== "minimized") {
+				chrome.tabs.query({ active: true, windowId: window.id }, function (tabs) {
+					if (tabs.length > 0) {
+						let aTab = tabs[0];
+						if (okId.indexOf(aTab.id) != -1) {
+							chrome.tabs.sendMessage(aTab.id, { action: "CheckYou", isSomeonePlayVideo: SomeonePlayVideo });
+						}
+					}
+				});
+			}
+		});
+	});
+}
+
+chrome.alarms.create('readLoop', { periodInMinutes: 3 / 60 });
+
+chrome.alarms.onAlarm.addListener(alarm => {
+	if (alarm.name === 'readLoop') {
+		doTask();
+	}
+});
 //-------------------------------------------------------------------------------------------------------------------------
 
 function DeBugResetData() {
 	let today = new Date()
-	// chrome.storage.local.set({ AllBrowsingTime: { Date: ["07/22", 6], BrowsingTime: {} } })
+	chrome.storage.local.set({ AllBrowsingTime: { Date: ["07/23", 0], BrowsingTime: { T1: 7 * 3600000 } } })
 	// chrome.storage.local.set({ AllBrowsingTime: { Date: [GetMyDay(today), today.getDay()], BrowsingTime: {} } })
-	// chrome.storage.local.set({ LastUpDataTime: "07/16" })
+	chrome.storage.local.set({ LastUpDataTime: ["07/22", 6] })
 	// chrome.storage.local.set({ LastUpDataTime: GetMyDay(today) })
 	// return
 	chrome.storage.local.set({
