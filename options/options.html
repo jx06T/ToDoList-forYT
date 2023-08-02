@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="..\options\options.css">
+    <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
+    <title>ToDoList-forYT</title>
+
+
+</head>
+
+<body>
+
+    <div id="sidebar">
+        <ul>
+            <li class="menu">
+                <div class="menu " data-page="welcome">
+                    <img class="Icon" src="..\images\house.svg" alt="welcome">
+                    <a href="#welcome" class="Stext">
+                        歡迎頁面
+                    </a>
+                </div>
+            </li>
+            <li class="menu">
+                <div class="menu" data-page="rules">
+                    <img class="Icon" src="..\images\tags.svg" alt="rules">
+                    <a href="#rules" class="Stext">
+                        規則設定
+                    </a>
+                </div>
+            </li>
+            <li class="menu">
+                <div class="menu" data-page="blockade">
+                    <img class="Icon" src="..\images\blockade.png" alt="blockade">
+                    <a href="#blockade" class="Stext">
+                        封鎖
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div id="main">
+
+        <div class="page active" id="welcome">
+            <h1>歡迎</h1>
+        </div>
+
+        <div class="page" id="rules">
+            <h1>設定頁面</h1>
+            <table id="Rules">
+                <tr>
+                    <th style="width:30%">Tag</th>
+                    <th>Rule</th>
+                </tr>
+                <!-- <tr data-index="0" class="" style="top: -15px;">
+                    <td><input type="text" class="aTag" placeholder="tag" tabindex="0" title="tag"></td>
+                    <td><textarea rows="5" class="aRule" placeholder="rule" title="rule"
+                            tabindex="0">https://www.youtube.com/</textarea></td>
+                </tr> -->
+            </table>
+            <div class="btn-column">
+                <button id="DaRow">x</button>
+                <button id="Drag">≡</button>
+                <button id="Deactivate">–</button>
+                <input type="color" id="colorPicker">
+            </div>
+        </div>
+
+        <div class="page" id="blockade">
+            <h1>封鎖</h1>
+            <table id="TagBTime">
+                <tr>
+                    <th style="width:30%">Tag</th>
+                    <th>Time</th>
+                </tr>
+                <tr data-index="0" class="" style="top: -15px;">
+                    <td>
+                        <select>
+                            <option value=0>tag</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" class="aTag" placeholder="time" tabindex="0" title="tag">
+                    </td>
+                </tr>
+            </table>
+            <div class="btn-column">
+                <button id="DaRow">x</button>
+                <button id="Drag">≡</button>
+                <button id="Deactivate">–</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="..\options\Blockade.js"></script>
+    <script src="..\options\Tags.js"></script>
+    <script src="..\options\Pages.js"></script>
+    <script src="..\options\options.js"></script>
+
+</body>
+
+</html>

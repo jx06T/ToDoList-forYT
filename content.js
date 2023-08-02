@@ -1,13 +1,15 @@
 
 const TitleT = document.querySelector("title")
+let Title = TitleT.innerText
 let Mytag
+let Jumping_in_line_count = 0
 GetTag()
 
 let isOnFocus = true
 let moveCount = 0;
 let MovementCount = 0
 async function GetTag() {
-    const title = TitleT.innerText
+    Title = TitleT.innerText
     const Myhostname = location.href
     const r = await chrome.storage.local.get("AllRule");
     const AllRule = r.AllRule;
@@ -22,7 +24,7 @@ async function GetTag() {
                 Mytag = aTag.tag
                 return
             }
-            if (aRule.test(title)) {
+            if (aRule.test(Title)) {
                 Mytag = aTag.tag
                 return
             }
@@ -48,6 +50,10 @@ window.addEventListener('beforeunload', () => {
 
 window.addEventListener('focus', () => {
     Onfocus()
+    if (Jumping_in_line_count < 3) {
+        chrome.runtime.sendMessage({ action: "Jumping_in_line", tag: Mytag })
+        Jumping_in_line_count++
+    }
 });
 
 function Onfocus() {
@@ -73,7 +79,7 @@ function isPlayingVideo() {
 
 function isMouseMove() {
     let isMouseMovee = false
-    if (moveCount > 40 || MovementCount > 30) {
+    if (moveCount > 40 && MovementCount > 25) {
         isOnFocus = true
         MovementCount = 0
     }
@@ -90,35 +96,42 @@ function isMouseMove() {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     let A = request.action
+    Jumping_in_line_count = 0
     switch (A) {
         case "CheckYou":
+            if (Title != TitleT.innerText) {
+                GetTag()
+            }
             let isPlayingVideoo = isPlayingVideo()
             let isMouseMoveo = isMouseMove()
+            console.log(isPlayingVideoo, isOnFocus, isMouseMoveo)
             if (!request.isSomeonePlayVideo) {
-                if (isPlayingVideoo || isOnFocus || isMouseMoveo) {
+                if (isMouseMoveo) {
                     chrome.runtime.sendMessage({ action: "Alive", tag: Mytag, isSomeonePlayVideo: isPlayingVideoo })
-                    console.log("!")
-                    if (!isPlayingVideoo && !isMouseMoveo) {
+                } else if (isPlayingVideoo || isOnFocus) {
+                    setTimeout(() => {
+                        chrome.runtime.sendMessage({ action: "Alive", tag: Mytag, isSomeonePlayVideo: isPlayingVideoo })
+                    }, 5);
+                    if (!isPlayingVideoo) {
                         MovementCount++
                     }
                 }
             } else {
                 if (isOnFocus && isMouseMoveo) {
                     chrome.runtime.sendMessage({ action: "Alive", tag: Mytag, isSomeonePlayVideo: isPlayingVideoo })
-                    console.log("!")
                 } else if (isOnFocus && isPlayingVideoo) {
                     chrome.runtime.sendMessage({ action: "Alive", tag: Mytag, isSomeonePlayVideo: isPlayingVideoo })
-                    console.log("!")
                 } else if (isPlayingVideoo) {
                     setTimeout(() => {
                         chrome.runtime.sendMessage({ action: "Alive", tag: Mytag, isSomeonePlayVideo: isPlayingVideoo })
                     }, 10);
-                } else if (isOnFocus && !isPlayingVideoo && !isMouseMoveo) {
+                } else if (isOnFocus) {
                     MovementCount++
                 }
             }
-            if (MovementCount > 30) {
+            if (MovementCount > 25) {
                 isOnFocus = false
+                console.log("!!")
             }
     }
 })

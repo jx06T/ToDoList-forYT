@@ -140,16 +140,22 @@ tr.Deactivate>td>* {
 }
 
 td {
-    height: 30px;
+    height: 88px;
     border-top: 5px solid #ccc;
     padding: 5px 10px;
+    /* background: linear-gradient(-90deg, red 0%, #ffffff 20%); */
 }
 
 .new-row td {
     border-top: 5px solid #eee;
 }
 
-#Rules {
+.new-row select {
+    color: #757575;
+}
+
+/* #Rules { */
+table {
     width: 850px;
     border-spacing: 30px 5px;
 }
@@ -179,6 +185,8 @@ h1 {
     margin-bottom: 50px;
     font-size: 32px;
 }
+
+
 
 a {
     font-size: 18px;
@@ -215,8 +223,27 @@ tr.beSelected {
     position: relative;
 
 }
-.btn-column>input{
+
+.btn-column>input {
     height: 20px;
     width: 32px;
     border: 0px;
+}
+
+/* -------------------------------------------------- */
+select {
+    border: none;
+    background-color: transparent;
+    border-radius: 0;
+    width: 100%;
+    padding: 10px;
+}
+
+select:focus {
+    outline: none;
+}
+
+option {
+    background-color: #ccc;
+    border: none #ccc;
 }

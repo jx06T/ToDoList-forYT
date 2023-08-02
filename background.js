@@ -6,6 +6,9 @@ function InitData() {
 	chrome.storage.local.set({
 		AllRule: [{ tag: "YT", rule: ["https://www.youtube.com/"], color: "#ff0000" }, { tag: "ChatGPT", rule: ["https://chat.openai.com/"], color: "#78afa1", deactivate: true }]
 	})
+	chrome.storage.local.set({
+		Blockade: [{ tag: "YT", time: 10 }, { tag: "ChatGPT", time: 5, deactivate: true }]
+	})
 }
 
 async function UpData() {
@@ -99,11 +102,26 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 		case "Add_url":
 			okId.push(TabId)
 			break
+		case "Jumping_in_line":
+			if (SomeonePlayVideo) {
+				break
+			}
+			let temp = { id: TabId, tag: request.tag, tab: sender.tab }
+			if (ActivePages[0] != temp) {
+				if (ActivePages.length > 0) {
+					AddTime(ActivePages[0].tag, ActivePages[0].tab.title)
+				}
+				ActivePages.unshift(temp)
+			}
+			break
 	}
 	return true;
 });
 
-function AddTime(tag) {
+function AddTime(tag, t = undefined) {
+	if (t) {
+		console.log(t)
+	}
 	if (tag == null) {
 		return
 	}
@@ -122,10 +140,10 @@ function AddTime(tag) {
 
 function doTask() {
 	if (ActivePages.length > 0) {
-		console.log(ActivePages)
-		AddTime(ActivePages[0].tag)
-		console.log(ActivePages[0].tab.title)
+		AddTime(ActivePages[0].tag, ActivePages[0].tab.title)
 		ActivePages = []
+	} else {
+		EnterTime = Date.now()
 	}
 	if (SomeonePlayVideo) {
 		chrome.tabs.get(PlayVideo_Tab, (tab) => {
