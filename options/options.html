@@ -55,11 +55,11 @@
                     <th style="width:30%">Tag</th>
                     <th>Rule</th>
                 </tr>
-                <!-- <tr data-index="0" class="" style="top: -15px;">
+                <tr data-index="0" class="" style="top: -15px;">
                     <td><input type="text" class="aTag" placeholder="tag" tabindex="0" title="tag"></td>
                     <td><textarea rows="5" class="aRule" placeholder="rule" title="rule"
                             tabindex="0">https://www.youtube.com/</textarea></td>
-                </tr> -->
+                </tr>
             </table>
             <div class="btn-column">
                 <button id="DaRow">x</button>
@@ -76,21 +76,48 @@
                     <th style="width:30%">Tag</th>
                     <th>Time</th>
                 </tr>
-                <tr data-index="0" class="" style="top: -15px;">
-                    <td>
-                        <select>
-                            <option value=0>tag</option>
-                        </select>
+                <tr data-index="1">
+                    <td><input class="aTag" type="text" title="tag" placeholder="tag" style="color: rgb(255, 0, 0);">
                     </td>
-                    <td>
-                        <input type="text" class="aTag" placeholder="time" tabindex="0" title="tag">
+                    <td class="LR">
+                        <div class="aTime">restricted：true<br> influenced：true<br> rest（min）： 20 ▷ 5<br> limit（hr）： 3／ 6
+                        </div>
+                        <div class="aTime">disabled：<br>23：00～08：00<br>11：00～13：00</div>
                     </td>
                 </tr>
             </table>
-            <div class="btn-column">
-                <button id="DaRow">x</button>
-                <button id="Drag">≡</button>
-                <button id="Deactivate">–</button>
+            <div id="BlockingDiv" class="form Invisible">
+                <div class="LR " id="BlockingSettings">
+                    <div class="UD formL">
+                        <div>
+                            <label>restricted</label>
+                            <label class="switch">
+                                <input id="restricted" type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div>
+                            <label>influenced</label>
+                            <label class="switch">
+                                <input id="influenced" type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div>rest<input id="rest1" type="number">▷<input id="rest2" type="number"></div>
+                        <div>limit<input id="limit1" type="number">／<input id="limit2" type="number"></div>
+                    </div>
+                    <!-- <textarea placeholder="disabled" name="disabled" id="disabled" rows="5"></textarea> -->
+                    <div class="UD formR" id="disableds">
+                        <div><input class="timeInput" type="time">～<input class="timeInput" type="time"></div>
+                        <div><input class="timeInput" type="time">～<input class="timeInput" type="time"></div>
+                        <div><input class="timeInput" type="time">～<input class="timeInput" type="time"></div>
+                        <div><input class="timeInput" type="time">～<input class="timeInput" type="time"></div>
+                    </div>
+                    <div class="BBB UD">
+                        <button id="BlockingDelete">delete</button>
+                        <button id="BlockingOk">confirm</button>
+                    </div>
+                </div>
             </div>
         </div>
 

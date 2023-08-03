@@ -135,7 +135,7 @@ class TagsMM {
                 this.ResetBtnColumn()
                 return
             }
-            this.BtncColumn.style.marginTop = (this.AllRule.length - index + 1) * -108 + 10 + "px"
+            this.BtncColumn.style.marginTop = (this.AllRule.length - index + 1) * -107.7 + 5 + "px"
             this.BtncColumn.dataset.Did = index
             this.BtncColumn.classList.add("showD")
             this.ColorPicker.value = this.AllRule[index].color
@@ -178,7 +178,7 @@ class TagsMM {
                     this.UpData(this.AllRule)
 
                 }
-                this.BtncColumn.style.marginTop = (this.AllRule.length - B + 1) * -108 + 10 + "px"
+                this.BtncColumn.style.marginTop = (this.AllRule.length - B + 1) * -107.7 + 5 + "px"
                 this.BtncColumn.dataset.Did = B
                 this.BtncColumn.classList.add("showD")
             }

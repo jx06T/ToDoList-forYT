@@ -7,7 +7,7 @@ function InitData() {
 		AllRule: [{ tag: "YT", rule: ["https://www.youtube.com/"], color: "#ff0000" }, { tag: "ChatGPT", rule: ["https://chat.openai.com/"], color: "#78afa1", deactivate: true }]
 	})
 	chrome.storage.local.set({
-		Blockade: [{ tag: "YT", time: 10 }, { tag: "ChatGPT", time: 5, deactivate: true }]
+		Blockade: [{ tag: 'YT', limit: [3, 6], rest: [20, 5], influenced: true, restricted: true, disabled: [["23:00", "08:00"], ["11:00", "13:00"]] }, { tag: 'ChatGPT', limit: [5, 12], rest: [5, 0], restricted: false, influenced: false, disabled: [["23:00", "08:00"], ["23:00", "08:00"]] }]
 	})
 }
 
@@ -120,7 +120,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 function AddTime(tag, t = undefined) {
 	if (t) {
-		console.log(t)
+		console.log(t, tag)
 	}
 	if (tag == null) {
 		return
@@ -166,6 +166,8 @@ function doTask() {
 						let aTab = tabs[0];
 						if (okId.indexOf(aTab.id) != -1) {
 							chrome.tabs.sendMessage(aTab.id, { action: "CheckYou", isSomeonePlayVideo: SomeonePlayVideo });
+						} else {
+							ELSE(aTab)
 						}
 					}
 				});
@@ -173,7 +175,33 @@ function doTask() {
 		});
 	});
 }
-
+function ELSE(aTab) {
+	console.log(aTab)
+	chrome.storage.local.get("AllRule").then((a) => {
+		let Mytag = "ELSE"
+		const AllRule = a.AllRule;
+		for (let i = 0; i < AllRule.length; i++) {
+			const aTag = AllRule[i];
+			if (aTag.deactivate) {
+				continue
+			}
+			for (let j = 0; j < aTag.rule.length; j++) {
+				const aRule = RegExp("^" + aTag.rule[j] + "$")
+				if (aRule.test(aTab.url)) {
+					Mytag = aTag.tag
+					ActivePages.push({ id: aTab.id, tag: Mytag, tab: aTab })
+					return
+				}
+				if (aRule.test(aTab.title)) {
+					Mytag = aTag.tag
+					ActivePages.push({ id: aTab.id, tag: Mytag, tab: aTab })
+					return
+				}
+			}
+		}
+		ActivePages.push({ id: aTab.id, tag: Mytag, tab: aTab })
+	})
+}
 chrome.alarms.create('readLoop', { periodInMinutes: 3 / 60 });
 
 chrome.alarms.onAlarm.addListener(alarm => {

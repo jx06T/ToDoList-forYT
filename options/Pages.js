@@ -26,9 +26,11 @@ class pagesM {
         this.mainDiv.addEventListener('click', () => {
             this.sidebar.classList.add("collapsed")
             this.mainDiv.classList.add("collapsed")
+            // BlockadeM.BlockingSettings.classList.add("collapsed")
         })
-
+        
         this.sidebar.addEventListener('click', () => {
+            // BlockadeM.BlockingSettings.classList.remove("collapsed")
             this.sidebar.classList.remove('collapsed');
             this.mainDiv.classList.remove('collapsed');
         });
