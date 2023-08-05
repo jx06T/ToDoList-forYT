@@ -16,7 +16,7 @@ class BlockadeMM {
         this.OkB = this.BlockingSettings.querySelector("#BlockingOk")
 
         this.TEMPLATE = {
-            tag: '', limit: ["", ""], rest: ["", ""], influenced: ["", ""], restricted: "", disabled: []
+            tag: '', limit: ["", ""], rest: ["", ""], influenced: ["", ""], restricted: true, disabled: []
         }
         setTimeout(() => {
             this.init()
@@ -233,6 +233,8 @@ class BlockadeMM {
             this.RuleTable.rows[index + 1].remove()
             this.UpData(this.Blockade)
             this.ResetId()
+            this.state = -1
+            this.BlockingSettings.classList.add('Invisible')
         })
         this.OkB.addEventListener("click", () => {
             if (this.state < 1 && this.state != 0) {
@@ -258,7 +260,9 @@ class BlockadeMM {
         this.BlockingSettings.dataset.index = i
         this.restrictedB.checked = aTag.restricted
         this.influenced1I.value = aTag.influenced[0]
+        this.influenced1I.style.color = this.TagToColor[aTag.influenced[0]]?this.TagToColor[aTag.influenced[0]]:"#000"
         this.influenced2I.value = aTag.influenced[1]
+        this.influenced2I.style.color = this.TagToColor[aTag.influenced[1]]?this.TagToColor[aTag.influenced[1]]:"#000"
         this.rest1I.value = aTag.rest[0]
         this.rest2I.value = aTag.rest[1]
         this.limit1I.value = aTag.limit[0]
