@@ -19,6 +19,9 @@ async function GetTag() {
             continue
         }
         for (let j = 0; j < aTag.rule.length; j++) {
+            if (aTag.rule[j] == "") {
+                continue
+            }
             const aRule = RegExp(aTag.rule[j])
             if (aRule.test(Myhostname)) {
                 Mytag = aTag.tag
@@ -141,11 +144,13 @@ chrome.runtime.sendMessage({ action: "Add_url" })
 setTimeout(() => {
     console.log(Mytag)
     if (Mytag == "TEST_J") {
-        let iframe = document.createElement('iframe');
-        iframe.src = 'TEST.html';
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        iframe.style.border = 'none';
+        const iframe = document.createElement('iframe');
+        iframe.id = 'jx06iframe';
+        iframe.allow = 'microphone;camera;';
+        iframe.sandbox = 'allow-scripts allow-same-origin allow-forms';
+        iframe.setAttribute('allowFullScreen', '');
+        iframe.scrolling = 'no';
+        iframe.src = chrome.runtime.getURL('TEST.html');
         document.body.appendChild(iframe);
     }
-}, 3000);
+}, 2000);

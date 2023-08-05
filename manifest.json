@@ -16,6 +16,16 @@
          "128": "images/ToDoYT128.png"
       }
    },
+   "web_accessible_resources": [
+      {
+         "resources": [
+            "TEST.html"
+         ],
+         "matches": [
+            "*://*/*"
+         ]
+      }
+   ],
    "permissions": [
       "tabs",
       "scrispting",
@@ -26,7 +36,8 @@
    "host_permissions": [
       "https://app.simplenote.com/publish/*",
       "http://*/*",
-      "https://*/*"
+      "https://*/*",
+      "chrome-extension://epoagflebjghjoehflcmddeabilfgaph/TEST.html"
    ],
    "icons": {
       "16": "images/ToDoYT16.png",

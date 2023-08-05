@@ -27,13 +27,13 @@ async function UpData() {
 		const r3 = await chrome.storage.local.get("aWeek");
 		let aWeek = r3.aWeek;
 
+		aWeek[aWeek.length - 1][LBrowsingTime.Date[1]] = { Date: LBrowsingTime.Date[0], BrowsingTime: LBrowsingTime.BrowsingTime }
 		if (parseInt(GetMyDay(today).slice(3, 5)) - parseInt(LastUpDataTime[0].slice(3, 5)) > (6 - LastUpDataTime[1])) {
 			if (aWeek.length > 3) {
 				aWeek.shift()
 			}
 			aWeek.push({})
 		}
-		aWeek[aWeek.length - 1][LBrowsingTime.Date[1]] = { Date: LBrowsingTime.Date[0], BrowsingTime: LBrowsingTime.BrowsingTime }
 		aWeek[aWeek.length - 1][today.getDay()] = { Date: GetMyDay(today), BrowsingTime: null }
 
 		chrome.storage.local.set({ aWeek: aWeek })
@@ -186,6 +186,9 @@ function ELSE(aTab) {
 				continue
 			}
 			for (let j = 0; j < aTag.rule.length; j++) {
+				if (aTag.rule[j] == "") {
+					continue
+				}
 				const aRule = RegExp(aTag.rule[j])
 				const UrlTitle = aTab.url + "\n" + aTab.title
 				if (aRule.test(UrlTitle)) {
