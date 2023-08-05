@@ -246,15 +246,13 @@ input:checked+.slider:before {
 
 .formL {
     width: 150px;
-}
-
-.formL,
-.formR {
-    margin: 10px;
+    margin-right: 70px;
 }
 
 .formL>div>* {
-    margin: 5px;
+    margin: 4px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .formL>div {
@@ -262,14 +260,27 @@ input:checked+.slider:before {
     align-items: center;
 }
 
-
 .formL input {
-    width: 45px
+    width: 45px;
+    height: 22px;
+}
+
+.form input {
+    border-radius: 4px;
+    border: solid 1px #0000008e;
+}
+
+#influenced1,#influenced2 {
+    width: 70px;
+}
+
+#disableds {
+    margin-top: 5px;
 }
 
 .timeInput {
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin-top: 7px;
+    margin-bottom: 7px;
 }
 
 /* ------------------------------------------------ */
@@ -368,13 +379,16 @@ tr.beSelected {
     border: 0px;
 }
 
-.BBB {
-    margin: 8px;
+.BtnDiv {
     height: 100%;
-    margin-top: 77px;
+    margin-left: 45px;
+    padding-top: 225px;
 }
 
-.BBB button {
-    height: 23px;
-    margin: 5px;
+.BtnDiv button {
+    height: 22px;
+    margin: 6px;
+    background-color: #ffffff;
+    border: solid 1px #0000008e;
+    border-radius: 5px;
 }

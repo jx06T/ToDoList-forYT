@@ -3,10 +3,10 @@ class BlockadeMM {
         this.Blockade = [{ tag: "YT", rule: ["https://www.youtube.com/", "s"] }, { tag: "ChatGPT", rule: ["https://chat.openai.com/"], deactivate: true }, { tag: "1", rule: ["1"] }, { tag: "2", rule: ["2"] }, { tag: "3", rule: ["3"] }]
         this.RuleTable = document.querySelector("#TagBTime")
         this.BlockingSettings = document.getElementById('BlockingSettings');
-        this.BlockingDiv = document.getElementById('BlockingDiv');
 
         this.restrictedB = this.BlockingSettings.querySelector("#restricted")
-        this.influencedB = this.BlockingSettings.querySelector("#influenced")
+        this.influenced1I = this.BlockingSettings.querySelector("#influenced1")
+        this.influenced2I = this.BlockingSettings.querySelector("#influenced2")
         this.rest1I = this.BlockingSettings.querySelector("#rest1")
         this.rest2I = this.BlockingSettings.querySelector("#rest2")
         this.limit1I = this.BlockingSettings.querySelector("#limit1")
@@ -16,7 +16,7 @@ class BlockadeMM {
         this.OkB = this.BlockingSettings.querySelector("#BlockingOk")
 
         this.TEMPLATE = {
-            tag: '', limit: ["", ""], rest: ["", ""], influenced: "", restricted: "", disabled: []
+            tag: '', limit: ["", ""], rest: ["", ""], influenced: ["", ""], restricted: "", disabled: []
         }
         setTimeout(() => {
             this.init()
@@ -148,17 +148,17 @@ class BlockadeMM {
             }
             const index = Number(parent.dataset.index) - 1
             this.SetBlockingSettings(index)
-            this.BlockingDiv.classList.remove('Invisible')
+            this.BlockingSettings.classList.remove('Invisible')
             this.state = 1
         })
         document.addEventListener('click', (e) => {
-            if (!this.BlockingDiv.contains(e.target) && this.state >= 0) {
+            if (!this.BlockingSettings.contains(e.target) && this.state >= 0) {
                 if (this.state < 2 && this.state != 0) {
                     this.state++
                     return
                 }
                 this.state = -1
-                this.BlockingDiv.classList.add('Invisible')
+                this.BlockingSettings.classList.add('Invisible')
             }
         })
         this.BlockingSettings.addEventListener("change", (e) => {
@@ -176,9 +176,14 @@ class BlockadeMM {
                     }
 
                     break;
-                case "influenced":
-                    aTag.influenced = target.checked
+                case "influenced1":
+                    aTag.influenced[0] = target.value
+                    target.style.color = this.TagToColor[target.value] ? this.TagToColor[target.value] : "#000"
                     break;
+                case "influenced2":
+                    aTag.influenced[1] = target.value
+                    target.style.color = this.TagToColor[target.value] ? this.TagToColor[target.value] : "#000"
+                    break
                 case "rest1":
                     aTag.rest[0] = target.value
                     break;
@@ -235,7 +240,7 @@ class BlockadeMM {
                 return
             }
             this.state = -1
-            this.BlockingDiv.classList.add('Invisible')
+            this.BlockingSettings.classList.add('Invisible')
         })
         document.addEventListener('keydown', () => {
             if (event.key === 'Escape') {
@@ -244,7 +249,7 @@ class BlockadeMM {
                     return
                 }
                 this.state = -1
-                this.BlockingDiv.classList.add('Invisible')
+                this.BlockingSettings.classList.add('Invisible')
             }
         });
     }
@@ -252,7 +257,8 @@ class BlockadeMM {
         const aTag = this.Blockade[i]
         this.BlockingSettings.dataset.index = i
         this.restrictedB.checked = aTag.restricted
-        this.influencedB.checked = aTag.influenced
+        this.influenced1I.value = aTag.influenced[0]
+        this.influenced2I.value = aTag.influenced[1]
         this.rest1I.value = aTag.rest[0]
         this.rest2I.value = aTag.rest[1]
         this.limit1I.value = aTag.limit[0]

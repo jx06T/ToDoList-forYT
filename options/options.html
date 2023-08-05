@@ -86,37 +86,36 @@
                     </td>
                 </tr>
             </table>
-            <div id="BlockingDiv" class="form Invisible">
-                <div class="LR " id="BlockingSettings">
-                    <div class="UD formL">
-                        <div>
-                            <label>restricted</label>
-                            <label class="switch">
-                                <input id="restricted" type="checkbox">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div>
-                            <label>influenced</label>
-                            <label class="switch">
-                                <input id="influenced" type="checkbox">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div>rest<input id="rest1" type="number">▷<input id="rest2" type="number"></div>
-                        <div>limit<input id="limit1" type="number">／<input id="limit2" type="number"></div>
+            <div class="LR form Invisible" id="BlockingSettings">
+                <div class="UD formL">
+                    <div>
+                        <label>restricted：</label>
+                        <label class="switch">
+                            <input id="restricted" type="checkbox">
+                            <span class="slider"></span>
+                        </label>
                     </div>
-                    <!-- <textarea placeholder="disabled" name="disabled" id="disabled" rows="5"></textarea> -->
-                    <div class="UD formR" id="disableds">
+                    <label style="margin-left: 3px;">influenced：</label>
+                    <div>
+                        <input id="influenced1" type="text">
+                        <input id="influenced2" type="text">
+                    </div>
+                    <div><label>rest：</label><input id="rest1" type="number">▷<input id="rest2" type="number"></div>
+                    <div><label>limit：</label><input id="limit1" type="number">／<input id="limit2" type="number"></div>
+                </div>
+                <!-- <textarea placeholder="disabled" name="disabled" id="disabled" rows="5"></textarea> -->
+                <div class="formR">
+                    <label class="timeInput">disabled time：</label>
+                    <div class="UD " id="disableds">
                         <div><input class="timeInput" type="time">～<input class="timeInput" type="time"></div>
                         <div><input class="timeInput" type="time">～<input class="timeInput" type="time"></div>
                         <div><input class="timeInput" type="time">～<input class="timeInput" type="time"></div>
                         <div><input class="timeInput" type="time">～<input class="timeInput" type="time"></div>
                     </div>
-                    <div class="BBB UD">
-                        <button id="BlockingDelete">delete</button>
-                        <button id="BlockingOk">confirm</button>
-                    </div>
+                </div>
+                <div class="BtnDiv UD">
+                    <button id="BlockingDelete">delete</button>
+                    <button id="BlockingOk">confirm</button>
                 </div>
             </div>
         </div>

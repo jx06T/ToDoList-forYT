@@ -10,7 +10,7 @@ let moveCount = 0;
 let MovementCount = 0
 async function GetTag() {
     Title = TitleT.innerText
-    const Myhostname = location.href
+    const Myhostname = location.href + "\n" + Title
     const r = await chrome.storage.local.get("AllRule");
     const AllRule = r.AllRule;
     for (let i = 0; i < AllRule.length; i++) {
@@ -19,15 +19,15 @@ async function GetTag() {
             continue
         }
         for (let j = 0; j < aTag.rule.length; j++) {
-            const aRule = RegExp("^" + aTag.rule[j] + "$")
+            const aRule = RegExp(aTag.rule[j])
             if (aRule.test(Myhostname)) {
                 Mytag = aTag.tag
                 return
             }
-            if (aRule.test(Title)) {
-                Mytag = aTag.tag
-                return
-            }
+            // if (aRule.test(Title)) {
+            //     Mytag = aTag.tag
+            //     return
+            // }
         }
     }
     Mytag = "ELSE"
@@ -79,7 +79,7 @@ function isPlayingVideo() {
 
 function isMouseMove() {
     let isMouseMovee = false
-    if (moveCount > 40 && MovementCount > 25) {
+    if (moveCount > 40 && MovementCount > 60) {
         isOnFocus = true
         MovementCount = 0
     }
@@ -129,10 +129,23 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     MovementCount++
                 }
             }
-            if (MovementCount > 25) {
+            if (MovementCount > 70) {
                 isOnFocus = false
                 console.log("!!")
             }
     }
 })
 chrome.runtime.sendMessage({ action: "Add_url" })
+
+
+setTimeout(() => {
+    console.log(Mytag)
+    if (Mytag == "TEST_J") {
+        let iframe = document.createElement('iframe');
+        iframe.src = 'TEST.html';
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.border = 'none';
+        document.body.appendChild(iframe);
+    }
+}, 3000);

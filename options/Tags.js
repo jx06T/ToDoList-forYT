@@ -119,6 +119,7 @@ class TagsMM {
                 NewData.tag = newRowInputV
                 NewData.rule = newRowTextV.split('\n')
                 NewData.color = this.GetRandColor()
+                newRowInput.style.color = NewData.color
                 this.AllRule.push(NewData)
                 this.UpData(this.AllRule)
                 return

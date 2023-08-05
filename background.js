@@ -7,7 +7,7 @@ function InitData() {
 		AllRule: [{ tag: "YT", rule: ["https://www.youtube.com/"], color: "#ff0000" }, { tag: "ChatGPT", rule: ["https://chat.openai.com/"], color: "#78afa1", deactivate: true }]
 	})
 	chrome.storage.local.set({
-		Blockade: [{ tag: 'YT', limit: [3, 6], rest: [20, 5], influenced: true, restricted: true, disabled: [["23:00", "08:00"], ["11:00", "13:00"]] }, { tag: 'ChatGPT', limit: [5, 12], rest: [5, 0], restricted: false, influenced: false, disabled: [["23:00", "08:00"], ["23:00", "08:00"]] }]
+		Blockade: [{ tag: 'YT', limit: [3, 6], rest: [20, 5], influenced: ["", ""], restricted: true, disabled: [["23:00", "08:00"], ["11:00", "13:00"]] }, { tag: 'ChatGPT', limit: [5, 12], rest: [5, 0], restricted: false, influenced: ["", ""], disabled: [["23:00", "08:00"], ["23:00", "08:00"]] }]
 	})
 }
 
@@ -186,13 +186,9 @@ function ELSE(aTab) {
 				continue
 			}
 			for (let j = 0; j < aTag.rule.length; j++) {
-				const aRule = RegExp("^" + aTag.rule[j] + "$")
-				if (aRule.test(aTab.url)) {
-					Mytag = aTag.tag
-					ActivePages.push({ id: aTab.id, tag: Mytag, tab: aTab })
-					return
-				}
-				if (aRule.test(aTab.title)) {
+				const aRule = RegExp(aTag.rule[j])
+				const UrlTitle = aTab.url + "\n" + aTab.title
+				if (aRule.test(UrlTitle)) {
 					Mytag = aTag.tag
 					ActivePages.push({ id: aTab.id, tag: Mytag, tab: aTab })
 					return
