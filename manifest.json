@@ -19,7 +19,7 @@
    "web_accessible_resources": [
       {
          "resources": [
-            "TEST.html"
+            "ToDoList.html"
          ],
          "matches": [
             "*://*/*"

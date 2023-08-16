@@ -86,35 +86,47 @@
                     </td>
                 </tr>
             </table>
-            <div class="LR form Invisible" id="BlockingSettings">
-                <div class="UD formL">
-                    <div>
-                        <label>restricted：</label>
-                        <label class="switch">
-                            <input id="restricted" type="checkbox">
-                            <span class="slider"></span>
-                        </label>
+            <div class="UD form Invisible" id="BlockingSettings">
+                <div class="LR">
+                    <div class="UD formL">
+                        <div>
+                            <label>restricted：</label>
+                            <label class="switch">
+                                <input id="restricted" type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <label style="margin-left: 3px;">impacted：</label>
+                        <div>
+                            <input id="impacted1" class="InputTagHere" type="text">
+                            <input id="impacted2" class="InputTagHere" type="text">
+                            <input id="impacted3" class="InputTagHere" type="text">
+                        </div>
+                        <div><label>rest：</label><input class="InputNumberHere" id="rest1" type="number">▷<input
+                                class="InputNumberHere" id="rest2" type="number">
+                            （min）</div>
+                        <div><label>limit：</label><input class="InputNumberHere" id="limit1" type="number">／<input
+                                class="InputNumberHere" id="limit2" type="number">（hr）
+                        </div>
+                        <div><label>Advance notice：</label><input class="InputNumberHere" id="Advance"
+                                type="number">（min）
+                        </div>
                     </div>
-                    <label style="margin-left: 3px;">influenced：</label>
-                    <div>
-                        <input id="influenced1" type="text">
-                        <input id="influenced2" type="text">
+                    <div class="formR">
+                        <label class="timeInput">disabled time：</label>
+                        <div class="UD " id="disableds">
+                            <div><input class="timeInput" type="time">～<input class="timeInput" type="time"></div>
+                            <div><input class="timeInput" type="time">～<input class="timeInput" type="time"></div>
+                            <div><input class="timeInput" type="time">～<input class="timeInput" type="time"></div>
+                            <div><input class="timeInput" type="time">～<input class="timeInput" type="time"></div>
+                            <div><input class="timeInput" type="time">～<input class="timeInput" type="time"></div>
+                        </div>
                     </div>
-                    <div><label>rest：</label><input id="rest1" type="number">▷<input id="rest2" type="number"></div>
-                    <div><label>limit：</label><input id="limit1" type="number">／<input id="limit2" type="number"></div>
                 </div>
-                <!-- <textarea placeholder="disabled" name="disabled" id="disabled" rows="5"></textarea> -->
-                <div class="formR">
-                    <label class="timeInput">disabled time：</label>
-                    <div class="UD " id="disableds">
-                        <div><input class="timeInput" type="time">～<input class="timeInput" type="time"></div>
-                        <div><input class="timeInput" type="time">～<input class="timeInput" type="time"></div>
-                        <div><input class="timeInput" type="time">～<input class="timeInput" type="time"></div>
-                        <div><input class="timeInput" type="time">～<input class="timeInput" type="time"></div>
-                    </div>
-                </div>
-                <div class="BtnDiv UD">
+                <hr>
+                <div class="BtnDiv LR">
                     <button id="BlockingDelete">delete</button>
+                    <button id="copy">copy</button>
                     <button id="BlockingOk">confirm</button>
                 </div>
             </div>

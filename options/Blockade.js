@@ -5,8 +5,9 @@ class BlockadeMM {
         this.BlockingSettings = document.getElementById('BlockingSettings');
 
         this.restrictedB = this.BlockingSettings.querySelector("#restricted")
-        this.influenced1I = this.BlockingSettings.querySelector("#influenced1")
-        this.influenced2I = this.BlockingSettings.querySelector("#influenced2")
+        this.impacted1I = this.BlockingSettings.querySelector("#impacted1")
+        this.impacted2I = this.BlockingSettings.querySelector("#impacted2")
+        this.impacted3I = this.BlockingSettings.querySelector("#impacted3")
         this.rest1I = this.BlockingSettings.querySelector("#rest1")
         this.rest2I = this.BlockingSettings.querySelector("#rest2")
         this.limit1I = this.BlockingSettings.querySelector("#limit1")
@@ -14,9 +15,11 @@ class BlockadeMM {
         this.disabledsD = this.BlockingSettings.querySelector("#disableds")
         this.deleteB = this.BlockingSettings.querySelector("#BlockingDelete")
         this.OkB = this.BlockingSettings.querySelector("#BlockingOk")
+        this.advanceI = this.BlockingSettings.querySelector("#Advance")
+        this.copyB = this.BlockingSettings.querySelector("#copy")
 
         this.TEMPLATE = {
-            tag: '', limit: ["", ""], rest: ["", ""], influenced: ["", ""], restricted: true, disabled: []
+            tag: '', limit: ["", ""], rest: ["", ""], impacted: ["", "",""], restricted: true, disabled: []
         }
         setTimeout(() => {
             this.init()
@@ -88,9 +91,10 @@ class BlockadeMM {
     }
     GetText = (aTag) => {
         let t1 = `restricted：${aTag.restricted}
-        influenced：${aTag.influenced}
+        impacted：${aTag.impacted}
         rest（min）： ${aTag.rest[0]} ▷ ${aTag.rest[1]}
-        limit（hr）：  ${aTag.limit[0]}／ ${aTag.limit[1]} `
+        limit（hr）：  ${aTag.limit[0]}／ ${aTag.limit[1]} 
+        Advance notice（min）：  ${aTag.advance}`
         const disabled = aTag.disabled.map(item => {
             return `${item[0].replace(':', '：')}～${item[1].replace(':', '：')}`
         })
@@ -176,12 +180,19 @@ class BlockadeMM {
                     }
 
                     break;
-                case "influenced1":
-                    aTag.influenced[0] = target.value
+                case "Advance":
+                    aTag.advance = target.value
+                    break
+                case "impacted1":
+                    aTag.impacted[0] = target.value
                     target.style.color = this.TagToColor[target.value] ? this.TagToColor[target.value] : "#000"
                     break;
-                case "influenced2":
-                    aTag.influenced[1] = target.value
+                case "impacted2":
+                    aTag.impacted[1] = target.value
+                    target.style.color = this.TagToColor[target.value] ? this.TagToColor[target.value] : "#000"
+                    break
+                case "impacted3":
+                    aTag.impacted[2] = target.value
                     target.style.color = this.TagToColor[target.value] ? this.TagToColor[target.value] : "#000"
                     break
                 case "rest1":
@@ -237,12 +248,18 @@ class BlockadeMM {
             this.BlockingSettings.classList.add('Invisible')
         })
         this.OkB.addEventListener("click", () => {
-            if (this.state < 1 && this.state != 0) {
-                this.state++
-                return
-            }
             this.state = -1
             this.BlockingSettings.classList.add('Invisible')
+        })
+        this.copyB.addEventListener("click", () => {
+            const index = Number(this.BlockingSettings.dataset.index)
+            const copy = JSON.parse(JSON.stringify(this.Blockade[index]))
+            this.Blockade.splice(index, 0, copy);
+            this.UpData(this.Blockade)
+            let HTML = this.GetNewRow(copy)
+            this.RuleTable.insertBefore(HTML, this.RuleTable.rows[index + 1]);
+            this.ResetId()
+            this.SetBlockingSettings(index + 1)
         })
         document.addEventListener('keydown', () => {
             if (event.key === 'Escape') {
@@ -259,14 +276,17 @@ class BlockadeMM {
         const aTag = this.Blockade[i]
         this.BlockingSettings.dataset.index = i
         this.restrictedB.checked = aTag.restricted
-        this.influenced1I.value = aTag.influenced[0]
-        this.influenced1I.style.color = this.TagToColor[aTag.influenced[0]]?this.TagToColor[aTag.influenced[0]]:"#000"
-        this.influenced2I.value = aTag.influenced[1]
-        this.influenced2I.style.color = this.TagToColor[aTag.influenced[1]]?this.TagToColor[aTag.influenced[1]]:"#000"
+        this.impacted1I.value = aTag.impacted[0]
+        this.impacted1I.style.color = this.TagToColor[aTag.impacted[0]] ? this.TagToColor[aTag.impacted[0]] : "#000"
+        this.impacted2I.value = aTag.impacted[1]
+        this.impacted2I.style.color = this.TagToColor[aTag.impacted[1]] ? this.TagToColor[aTag.impacted[1]] : "#000"
+        this.impacted3I.value = aTag.impacted[2]
+        this.impacted3I.style.color = this.TagToColor[aTag.impacted[2]] ? this.TagToColor[aTag.impacted[2]] : "#000"
         this.rest1I.value = aTag.rest[0]
         this.rest2I.value = aTag.rest[1]
         this.limit1I.value = aTag.limit[0]
         this.limit2I.value = aTag.limit[1]
+        this.advanceI.value = aTag.advance
         this.disabledsD.childNodes.forEach((item, ii) => {
             if (ii % 2 == 0) {
                 return
@@ -289,4 +309,5 @@ class BlockadeMM {
         });
 
     }
+
 }

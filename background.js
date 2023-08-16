@@ -7,7 +7,7 @@ function InitData() {
 		AllRule: [{ tag: "YT", rule: ["https://www.youtube.com/"], color: "#ff0000" }, { tag: "ChatGPT", rule: ["https://chat.openai.com/"], color: "#78afa1", deactivate: true }]
 	})
 	chrome.storage.local.set({
-		Blockade: [{ tag: 'YT', limit: [3, 6], rest: [20, 5], influenced: ["", ""], restricted: true, disabled: [["23:00", "08:00"], ["11:00", "13:00"]] }, { tag: 'ChatGPT', limit: [5, 12], rest: [5, 0], restricted: false, influenced: ["", ""], disabled: [["23:00", "08:00"], ["23:00", "08:00"]] }]
+		Blockade: [{ tag: 'YT', advance: 3, limit: [3, 6], rest: [20, 5], impacted: ["claude", "", ""], restricted: true, disabled: [["23:00", "08:00"], ["11:00", "13:00"]] }, { tag: 'ChatGPT', advance: 3, limit: [5, 12], rest: [5, 0], restricted: false, impacted: ["", "", ""], disabled: [["23:00", "08:00"], ["23:00", "08:00"]] }]
 	})
 }
 
@@ -53,11 +53,18 @@ function GetMyDay(today) {
 
 chrome.runtime.onStartup.addListener(() => {
 	UpData()
+	chrome.alarms.create('midnight', { when: getMidnight() });
 });
 chrome.runtime.onInstalled.addListener(() => {
 	UpData()
 	// chrome.tabs.create({ url: "extension://epoagflebjghjoehflcmddeabilfgaph/options.html#rules" });
 })
+
+function getMidnight() {
+	var date = new Date();
+	date.setHours(24, 5, 0, 0);
+	return date.getTime();
+}
 
 //------------------------------------------------------------------------------------------------------------------------
 let ActivePages = []
@@ -71,7 +78,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	const TabId = sender.tab.id
 	switch (A) {
 		case "test":
-			console.log("!!!!!", sender, request.TestText)
+			// console.log("!!!!!", sender, request.TestText)
 			break
 		case "Turned_off":
 			if (PlayVideo_Tab == TabId) {
@@ -120,7 +127,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 function AddTime(tag, t = undefined) {
 	if (t) {
-		console.log(t, tag)
+		// console.log(t, tag)
 	}
 	if (tag == null) {
 		return
@@ -176,7 +183,7 @@ function doTask() {
 	});
 }
 function ELSE(aTab) {
-	console.log(aTab)
+	// console.log(aTab)
 	chrome.storage.local.get("AllRule").then((a) => {
 		let Mytag = "ELSE"
 		const AllRule = a.AllRule;
@@ -206,6 +213,10 @@ chrome.alarms.create('readLoop', { periodInMinutes: 3 / 60 });
 chrome.alarms.onAlarm.addListener(alarm => {
 	if (alarm.name === 'readLoop') {
 		doTask();
+	}
+	if (alarm.name === 'midnight') {
+		UpData()
+		chrome.alarms.create('midnight', { when: getMidnight() });
 	}
 });
 //-------------------------------------------------------------------------------------------------------------------------
