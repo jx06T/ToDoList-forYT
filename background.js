@@ -76,6 +76,8 @@ let PlayVideo_Tab = undefined
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	let A = request.action
 	const TabId = sender.tab.id
+	const dns = new URL(sender.origin).hostname;
+	// console.log(sender)
 	switch (A) {
 		case "test":
 			// console.log("!!!!!", sender, request.TestText)
@@ -97,7 +99,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 			okId.splice(okId.indexOf(TabId), 1)
 			break
 		case "Alive":
-			ActivePages.push({ id: TabId, tag: request.tag, tab: sender.tab })
+			ActivePages.push({ id: TabId, tag: request.tag, dns: dns, title: sender.tab.title, tab: sender.tab })
 			if (request.isSomeonePlayVideo) {
 				SomeonePlayVideo = true
 				PlayVideo_Tab = TabId
@@ -113,10 +115,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 			if (SomeonePlayVideo) {
 				break
 			}
-			let temp = { id: TabId, tag: request.tag, tab: sender.tab }
+			let temp = { id: TabId, tag: request.tag, dns: dns, title: sender.tab.title, tab: sender.tab }
 			if (ActivePages[0] != temp) {
 				if (ActivePages.length > 0) {
-					AddTime(ActivePages[0].tag, ActivePages[0].tab.title)
+					AddTime(ActivePages[0].tag, ActivePages[0].dns, ActivePages[0].title)
 				}
 				ActivePages.unshift(temp)
 			}
@@ -125,29 +127,32 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	return true;
 });
 
-function AddTime(tag, t = undefined) {
-	if (t) {
-		// console.log(t, tag)
-	}
+function AddTime(tag, dns, title) {
 	if (tag == null) {
 		return
 	}
+	// console.log(tag, dns, title)
 	let BrowsingTime = Date.now() - EnterTime
 	chrome.storage.local.get(["AllBrowsingTime"]).then((result) => {
-		let OldAllBrowsingTime = result.AllBrowsingTime
-		if (OldAllBrowsingTime.BrowsingTime[tag] == undefined) {
-			OldAllBrowsingTime.BrowsingTime[tag] = BrowsingTime
-		} else {
-			OldAllBrowsingTime.BrowsingTime[tag] = OldAllBrowsingTime.BrowsingTime[tag] += BrowsingTime
-		}
-		chrome.storage.local.set({ AllBrowsingTime: OldAllBrowsingTime })
+		let rBrowsingTime = result.AllBrowsingTime
+		let OldAllBrowsingTime = rBrowsingTime.BrowsingTime
+
+		OldAllBrowsingTime[tag] = OldAllBrowsingTime[tag] || { _total_: 0 }
+		OldAllBrowsingTime[tag][dns] = OldAllBrowsingTime[tag][dns] || { _total_: 0 }
+		OldAllBrowsingTime[tag][dns][title] = OldAllBrowsingTime[tag][dns][title] || 0
+
+		OldAllBrowsingTime[tag]._total_ += BrowsingTime
+		OldAllBrowsingTime[tag][dns]._total_ += BrowsingTime
+		OldAllBrowsingTime[tag][dns][title] += BrowsingTime
+
+		chrome.storage.local.set({ AllBrowsingTime: rBrowsingTime })
 	})
 	EnterTime = Date.now()
 }
 
 function doTask() {
 	if (ActivePages.length > 0) {
-		AddTime(ActivePages[0].tag, ActivePages[0].tab.title)
+		AddTime(ActivePages[0].tag, ActivePages[0].dns, ActivePages[0].title)
 		ActivePages = []
 	} else {
 		EnterTime = Date.now()
@@ -187,6 +192,7 @@ function ELSE(aTab) {
 	chrome.storage.local.get("AllRule").then((a) => {
 		let Mytag = "ELSE"
 		const AllRule = a.AllRule;
+		const dns = new URL(aTab.url).hostname;
 		for (let i = 0; i < AllRule.length; i++) {
 			const aTag = AllRule[i];
 			if (aTag.deactivate) {
@@ -200,12 +206,12 @@ function ELSE(aTab) {
 				const UrlTitle = aTab.url + "\n" + aTab.title
 				if (aRule.test(UrlTitle)) {
 					Mytag = aTag.tag
-					ActivePages.push({ id: aTab.id, tag: Mytag, tab: aTab })
+					ActivePages.push({ id: aTab.id, tag: Mytag, dns: dns, title: aTab.title, tab: aTab })
 					return
 				}
 			}
 		}
-		ActivePages.push({ id: aTab.id, tag: Mytag, tab: aTab })
+		ActivePages.push({ id: aTab.id, tag: Mytag, dns: dns, title: aTab.title, tab: aTab })
 	})
 }
 chrome.alarms.create('readLoop', { periodInMinutes: 3 / 60 });
@@ -223,41 +229,29 @@ chrome.alarms.onAlarm.addListener(alarm => {
 
 function DeBugResetData() {
 	let today = new Date()
-	chrome.storage.local.set({ AllBrowsingTime: { Date: ["07/23", 0], BrowsingTime: { T1: 7 * 3600000 } } })
+	chrome.storage.local.set({ AllBrowsingTime: { Date: ["08/18", 5], BrowsingTime: { code: { _total_: 7 * 3600000, "github.com": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } } })
 	// chrome.storage.local.set({ AllBrowsingTime: { Date: [GetMyDay(today), today.getDay()], BrowsingTime: {} } })
-	chrome.storage.local.set({ LastUpDataTime: ["07/22", 6] })
+	chrome.storage.local.set({ LastUpDataTime: ["08/18", 5] })
 	// chrome.storage.local.set({ LastUpDataTime: GetMyDay(today) })
 	// return
 	chrome.storage.local.set({
 		aWeek:
 			[{
-				0: { Date: "06/02", BrowsingTime: { T1: 7 * 3600000 } },
-				1: { Date: "06/03", BrowsingTime: { T1: 2 * 3600000 } },
-				2: { Date: "06/04", BrowsingTime: { T1: 4 * 3600000 } },
-				3: { Date: "06/05", BrowsingTime: { T1: 1 * 3600000 } },
-				4: { Date: "06/06", BrowsingTime: { T1: 9 * 3600000 } },
-				5: { Date: "06/07", BrowsingTime: { T1: 3 * 3600000 } },
-				6: { Date: "06/08", BrowsingTime: { T1: 5 * 3600000 } },
+				0: { Date: "07/23", BrowsingTime: { code: { _total_: 7 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				1: { Date: "07/24", BrowsingTime: { code: { _total_: 6 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				2: { Date: "07/25", BrowsingTime: { code: { _total_: 5 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				3: { Date: "07/26", BrowsingTime: { code: { _total_: 4 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				4: { Date: "07/27", BrowsingTime: { code: { _total_: 3 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				5: { Date: "07/28", BrowsingTime: { code: { _total_: 2 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				6: { Date: "07/29", BrowsingTime: { code: { _total_: 1 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } }
 			},
 			{
-				0: { Date: "07/02", BrowsingTime: { T1: 7 * 3600000 } },
-				1: { Date: "07/03", BrowsingTime: { T1: 6 * 3600000 } },
-				2: { Date: "07/04", BrowsingTime: { T1: 5 * 3600000 } },
-				3: { Date: "07/05", BrowsingTime: { T1: 4 * 3600000 } },
-				4: { Date: "07/06", BrowsingTime: { T1: 3 * 3600000 } },
-				5: { Date: "07/07", BrowsingTime: { T1: 2 * 3600000 } },
-				6: { Date: "07/08", BrowsingTime: { T1: 1 * 3600000 } },
-			}, {
-				0: { Date: "07/09", BrowsingTime: { T1: 1 * 3600000 } },
-				1: { Date: "07/10", BrowsingTime: { T1: 2 * 3600000 } },
-				2: { Date: "07/11", BrowsingTime: { T1: 3 * 3600000 } },
-				3: { Date: "07/12", BrowsingTime: { T1: 4 * 3600000 } },
-				4: { Date: "07/13", BrowsingTime: { T1: 5 * 3600000 } },
-				5: { Date: "07/14", BrowsingTime: { T1: 6 * 3600000 } },
-				6: { Date: "07/15", BrowsingTime: { T1: 7 * 3600000 } },
-			}, {
-				0: { Date: "07/23", BrowsingTime: null },
-			},
-			]
+				0: { Date: "07/30", BrowsingTime: { code: { _total_: 7 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				1: { Date: "08/01", BrowsingTime: { code: { _total_: 6 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				2: { Date: "08/02", BrowsingTime: { code: { _total_: 5 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				3: { Date: "08/03", BrowsingTime: { code: { _total_: 4 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				4: { Date: "08/04", BrowsingTime: { code: { _total_: 3 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				5: { Date: "08/05", BrowsingTime: null },
+			}]
 	})
 }

@@ -125,15 +125,15 @@ div.menu {
     align-items: center;
 }
 
+/* 整體側攔-------------------------------------------------------------------------------------------------------- */
+
+
+
 th {
     height: 34px;
     font-family: sans-serif;
     font-size: 16px;
 }
-
-
-
-
 
 td {
     /* height: 88px; */
@@ -142,16 +142,6 @@ td {
     /* background: linear-gradient(-90deg, red 0%, #ffffff 20%); */
 }
 
-
-.LR {
-    display: flex;
-    flex-flow: row nowrap;
-}
-
-.UD {
-    display: flex;
-    flex-flow: column;
-}
 
 
 .aTime {
@@ -167,7 +157,73 @@ td {
     text-underline-position: under;
 }
 
-/* ------------------------------------------------ */
+
+.new-row select {
+    color: #757575;
+}
+
+.Deactivate td {
+    border-top: 5px dashed #e0dede;
+}
+
+tr.Deactivate>td>* {
+    color: #a5a5a5;
+}
+
+.new-row td {
+    border-top: 5px solid #f3f2f2;
+}
+
+
+/* #Rules { */
+table {
+    width: 850px;
+    border-spacing: 30px 5px;
+}
+
+.aTag {
+    height: 100%;
+    width: 100%;
+    border: none;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+input {
+    box-sizing: border-box;
+    vertical-align: middle;
+    outline: none;
+}
+
+.aRule {
+    text-align: left;
+    width: 100%;
+    height: 100%;
+    margin-top: 4px;
+    resize: none;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+}
+
+h1 {
+    margin-left: 20px;
+    margin-bottom: 50px;
+    font-size: 32px;
+}
+
+.menu>a {
+    font-size: 18px;
+    font-family: sans-serif;
+}
+
+tr.beSelected {
+    position: relative;
+
+}
+
+
+/* 表格------------------------------------------------ */
 
 .switch {
     position: relative;
@@ -218,11 +274,9 @@ input:checked+.slider:before {
     transform: translateX(15px);
 }
 
+/* 開關------------------------------------------------------------------------------------ */
 .form {
     animation: showDiv 0.2s forwards;
-    /* display: flex; */
-    /* justify-content: center; */
-    /* align-items: center; */
     background-color: rgba(240, 240, 240, 0.9);
     width: 600px;
     height: 300px;
@@ -303,66 +357,7 @@ input:checked+.slider:before {
     margin-bottom: 7px;
 }
 
-/* ------------------------------------------------ */
-
-.new-row select {
-    color: #757575;
-}
-
-.Deactivate td {
-    border-top: 5px dashed #e0dede;
-}
-
-tr.Deactivate>td>* {
-    color: #a5a5a5;
-}
-
-.new-row td {
-    border-top: 5px solid #f3f2f2;
-}
-
-
-/* #Rules { */
-table {
-    width: 850px;
-    border-spacing: 30px 5px;
-}
-
-.aTag {
-    height: 100%;
-    width: 100%;
-    border: none;
-    font-weight: 600;
-    font-size: 15px;
-}
-
-input {
-    box-sizing: border-box;
-    vertical-align: middle;
-    outline: none;
-}
-
-.aRule {
-    text-align: left;
-    width: 100%;
-    height: 100%;
-    margin-top: 4px;
-    resize: none;
-    box-sizing: border-box;
-    border: none;
-    outline: none;
-}
-
-h1 {
-    margin-left: 20px;
-    margin-bottom: 50px;
-    font-size: 32px;
-}
-
-.menu>a {
-    font-size: 18px;
-    font-family: sans-serif;
-}
+/* 彈出設定框------------------------------------------------ */
 
 .btn-column {
     margin-left: 840px;
@@ -389,11 +384,6 @@ h1 {
     margin-bottom: 10px;
 }
 
-tr.beSelected {
-    position: relative;
-
-}
-
 .btn-column>input {
     height: 20px;
     width: 32px;
@@ -407,10 +397,13 @@ tr.beSelected {
 }
 
 .BtnDiv button {
-    height: 22px;
-    background-color: #ffffff;
     margin-left: 45px;
     margin-right: 45px;
+    height: 22px;
+}
+
+.MyButton1 {
+    background-color: #ffffff;
     border: solid 1px #0000008e;
     border-radius: 5px;
     font-size: 15px;
@@ -421,4 +414,27 @@ hr {
     margin-top: 20px;
     height: 0.7px;
     background-color: #3d3d3d;
+}
+
+#ExportTagD {
+    border-left: 2px solid #8f8f8f;
+}
+
+.MyButton2 {
+    border: solid 1.5px #0000008e;
+    font-size: 22px;
+    font-weight: 550;
+    margin-bottom: 15px;
+    margin-left: 25px;
+}
+
+
+.LR {
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+.UD {
+    display: flex;
+    flex-flow: column;
 }

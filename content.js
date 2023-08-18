@@ -27,10 +27,7 @@ async function GetTag() {
                 Mytag = aTag.tag
                 return
             }
-            // if (aRule.test(Title)) {
-            //     Mytag = aTag.tag
-            //     return
-            // }
+
         }
     }
     Mytag = "ELSE"
@@ -107,7 +104,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             }
             let isPlayingVideoo = isPlayingVideo()
             let isMouseMoveo = isMouseMove()
-            console.log(isPlayingVideoo, isOnFocus, isMouseMoveo)
+            // console.log(isPlayingVideoo, isOnFocus, isMouseMoveo)
             if (!request.isSomeonePlayVideo) {
                 if (isMouseMoveo) {
                     chrome.runtime.sendMessage({ action: "Alive", tag: Mytag, isSomeonePlayVideo: isPlayingVideoo })
@@ -149,8 +146,7 @@ setTimeout(() => {
         iframe.allow = 'microphone;camera;';
         iframe.sandbox = 'allow-scripts allow-same-origin allow-forms';
         iframe.setAttribute('allowFullScreen', '');
-        iframe.scrolling = 'no';
-        iframe.src = chrome.runtime.getURL('TEST.html');
+        iframe.src = chrome.runtime.getURL('ToDoList.html');
         document.body.appendChild(iframe);
     }
-}, 2000);
+}, 1000);

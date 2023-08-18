@@ -50,22 +50,31 @@
 
         <div class="page" id="rules">
             <h1>設定頁面</h1>
-            <table id="Rules">
-                <tr>
-                    <th style="width:30%">Tag</th>
-                    <th>Rule</th>
-                </tr>
-                <tr data-index="0" class="" style="top: -15px;">
-                    <td><input type="text" class="aTag" placeholder="tag" tabindex="0" title="tag"></td>
-                    <td><textarea rows="5" class="aRule" placeholder="rule" title="rule"
-                            tabindex="0">https://www.youtube.com/</textarea></td>
-                </tr>
-            </table>
-            <div class="btn-column">
-                <button id="DaRow">x</button>
-                <button id="Drag">≡</button>
-                <button id="Deactivate">–</button>
-                <input type="color" id="colorPicker">
+            <div class=" LR">
+                <div style="height: 100%;">
+                    <table id="Rules">
+                        <tr>
+                            <th style="width:30%">Tag</th>
+                            <th>Rule</th>
+                        </tr>
+                        <tr data-index="0" class="" style="top: -15px;">
+                            <td><input type="text" class="aTag" placeholder="tag" tabindex="0" title="tag"></td>
+                            <td><textarea rows="5" class="aRule" placeholder="rule" title="rule"
+                                    tabindex="0">https://www.youtube.com/</textarea></td>
+                        </tr>
+                    </table>
+                    <div class="btn-column">
+                        <button id="DaRow">x</button>
+                        <button id="Drag">≡</button>
+                        <button id="Deactivate">–</button>
+                        <input type="color" id="colorPicker">
+                    </div>
+                </div>
+                <div id="ExportTagD" style="margin-left: 30px; height: 100%;">
+                    <button id="ExportTag" class="MyButton1 MyButton2">匯出</button>
+                    <button id="ImportTag" class="MyButton1 MyButton2">匯入</button>
+                    <input type="file" class="MyButton1" id="ImportTagI" accept="application/json" hidden>
+                </div>
             </div>
         </div>
 
@@ -125,9 +134,9 @@
                 </div>
                 <hr>
                 <div class="BtnDiv LR">
-                    <button id="BlockingDelete">delete</button>
-                    <button id="copy">copy</button>
-                    <button id="BlockingOk">confirm</button>
+                    <button id="BlockingDelete" class="MyButton1">delete</button>
+                    <button id="copy" class="MyButton1">copy</button>
+                    <button id="BlockingOk" class="MyButton1">confirm</button>
                 </div>
             </div>
         </div>

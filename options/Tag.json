@@ -1,0 +1,25 @@
+[
+    {
+        "color": "#3c1c82",
+        "rule": [
+            "https://pedia.cloud.edu.tw/Entry/Detail/\\?title=%E8%A8%97&search=%E8%A8%97"
+        ],
+        "tag": "TEST_J"
+    },
+    {
+        "color": "#ff0000",
+        "deactivate": false,
+        "rule": [
+            "https://www.youtube.com/"
+        ],
+        "tag": "YT"
+    },
+    {
+        "color": "#78afa1",
+        "deactivate": true,
+        "rule": [
+            "https://chat.openai.com/"
+        ],
+        "tag": "ChatGPT"
+    }
+]

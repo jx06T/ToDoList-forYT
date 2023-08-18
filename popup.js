@@ -29,7 +29,7 @@ function initChart() {
                 labels: r[1],
                 datasets: [{
                     label: "Today's BrowsingTime",
-                    data: [0],
+                    data: r[0],
                     backgroundColor: r[2],
                     hoverOffset: 4
                 }]
@@ -176,11 +176,11 @@ function calculationBT(BrowsingTime, t = 0) {
     }
     for (let key in BrowsingTime) {
         if (t == 1) {
-            TodayTotal += BrowsingTime[key]
+            TodayTotal += BrowsingTime[key]._total_
         }
         AllLabels.push(key)
         colors.push(getColorByTag(key))
-        AllTime.push((BrowsingTime[key] / 60000).toFixed(2))
+        AllTime.push((BrowsingTime[key]._total_ / 60000).toFixed(2))
     }
 
     return [AllTime, AllLabels, colors]
@@ -202,7 +202,7 @@ function CaWeekBT(data) {
             continue
         }
         for (let key2 in aDay.BrowsingTime) {
-            total += aDay.BrowsingTime[key2];
+            total += aDay.BrowsingTime[key2]._total_;
         }
         total = (total / 3600000).toFixed(2)
         totals.push(total)

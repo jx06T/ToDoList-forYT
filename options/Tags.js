@@ -2,11 +2,14 @@ class TagsMM {
     constructor() {
         this.AllRule = [{ tag: "YT", rule: ["https://www.youtube.com/", "s"] }, { tag: "ChatGPT", rule: ["https://chat.openai.com/"], deactivate: true }, { tag: "1", rule: ["1"] }, { tag: "2", rule: ["2"] }, { tag: "3", rule: ["3"] }]
         this.RuleTable = document.querySelector("#Rules")
-        this.BtncColumn = document.querySelector("#rules>.btn-column")
+        this.BtncColumn = document.querySelector("#rules .btn-column")
         this.DaRowB = this.BtncColumn.querySelector("#DaRow")
         this.DragB = this.BtncColumn.querySelector("#Drag")
         this.DeactivateB = this.BtncColumn.querySelector("#Deactivate")
         this.ColorPicker = this.BtncColumn.querySelector("#colorPicker")
+        this.ExportTagB = document.querySelector("#ExportTag")
+        this.ImportTagB = document.querySelector("#ImportTag")
+        this.ImportTagI = document.querySelector("#ImportTagI")
         this.init()
         this.listen()
     }
@@ -128,6 +131,40 @@ class TagsMM {
             this.AllRule[Number(parent.dataset.index)].rule = newRowTextV.split('\n')
             this.UpData(this.AllRule)
         })
+        this.ExportTagB.addEventListener('click', () => {
+            let jsonData = JSON.stringify(this.AllRule);
+            let blob = new Blob([jsonData], {
+                type: "application/json"
+            });
+            let fileName = "Tag.json";
+            let href = URL.createObjectURL(blob);
+
+            let link = document.createElement("a");
+            link.href = href;
+            link.download = fileName;
+
+            document.body.appendChild(link);
+            link.click();
+        })
+        this.ImportTagB.addEventListener('click', () => {
+            this.ImportTagI.click()
+        })
+        this.ImportTagI.addEventListener('change', () => {
+            const file = this.ImportTagI.files[0];
+            if (!file) return
+            const reader = new FileReader();
+            reader.onload = () => {
+                const Idata = JSON.parse(reader.result);
+                if (this.ValidateData(Idata)) {
+                    this.AllRule = Idata
+                    this.UpData(this.AllRule)
+                    this.InitTable()
+                } else {
+                    alert("設定檔格式錯誤或缺少必要參數，請檢查檔案")
+                }
+            };
+            reader.readAsText(file);
+        })
         this.RuleTable.addEventListener('focusin', (event) => {
             const target = event.target;
             const parent = target.parentNode.parentNode
@@ -234,6 +271,25 @@ class TagsMM {
             this.UpData(this.AllRule)
         });
 
+    }
+    ValidateData(data) {
+        if (!Array.isArray(data)) {
+            return false;
+        }
+        for (let item of data) {
+            if (!item.hasOwnProperty('color') ||
+                !item.hasOwnProperty('rule') ||
+                !item.hasOwnProperty('tag')) {
+                return false;
+            }
+            if (typeof item.color !== 'string' ||
+                !Array.isArray(item.rule) ||
+                typeof item.tag !== 'string'
+            ) {
+                return false;
+            }
+        }
+        return true
     }
     swapRows = (fromIndex, toIndex) => {
         const row1 = this.RuleTable.rows[fromIndex];
