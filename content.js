@@ -1,7 +1,8 @@
 
 const TitleT = document.querySelector("title")
 let Title = TitleT.innerText
-let Mytag
+let Mytag = "ELSE"
+let Mytags = ["ALL"]
 let Jumping_in_line_count = 0
 GetTag()
 
@@ -9,6 +10,9 @@ let isOnFocus = true
 let moveCount = 0;
 let MovementCount = 0
 async function GetTag() {
+    Mytag = "ELSE"
+    Mytags = []
+    Mytags.push("ALL")
     Title = TitleT.innerText
     const Myhostname = location.href + "\n" + Title
     const r = await chrome.storage.local.get("AllRule");
@@ -18,19 +22,36 @@ async function GetTag() {
         if (aTag.deactivate) {
             continue
         }
+        let _opposite = true
+        let _stop = false
+        if (aTag.rule[0].slice(0, 3) == "!--") {
+            _opposite = !aTag.rule[0].includes("--opposite")
+            _stop = aTag.rule[0].includes("--stop")
+        }
         for (let j = 0; j < aTag.rule.length; j++) {
-            if (aTag.rule[j] == "") {
+            if (aTag.rule[j] == "" || aTag.rule[j].slice(0, 3) == "!--") {
                 continue
             }
             const aRule = RegExp(aTag.rule[j])
-            if (aRule.test(Myhostname)) {
-                Mytag = aTag.tag
-                return
+            if (opposite(aRule.test(Myhostname), _opposite)) {
+                // console.log(aRule.test(Myhostname), aTag.tag, _opposite, _stop)
+                if (Mytag == "ELSE") {
+                    Mytag = aTag.tag
+                }
+                Mytags.push(aTag.tag)
+                if (_stop) {
+                    return
+                }
             }
 
         }
     }
-    Mytag = "ELSE"
+    if (Mytag == "ELSE") {
+        Mytags.push("ELSE")
+    }
+}
+function opposite(a, b = true) {
+    return (a && b) || (!a && !b)
 }
 
 document.addEventListener('wheel', () => {
@@ -139,7 +160,7 @@ chrome.runtime.sendMessage({ action: "Add_url" })
 
 
 setTimeout(() => {
-    console.log(Mytag)
+    console.log(Mytags)
     if (Mytag == "TEST_J") {
         const iframe = document.createElement('iframe');
         iframe.id = 'jx06iframe';
