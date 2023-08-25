@@ -80,7 +80,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	// console.log(sender)
 	switch (A) {
 		case "test":
-			// console.log("!!!!!", sender, request.TestText)
+			console.log("!!!!!", sender, request.TestText)
 			break
 		case "Turned_off":
 			if (PlayVideo_Tab == TabId) {

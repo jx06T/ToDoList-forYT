@@ -161,7 +161,7 @@ chrome.runtime.sendMessage({ action: "Add_url" })
 
 setTimeout(() => {
     console.log(Mytags)
-    if (Mytag == "TEST_J") {
+    if (Mytag == "XX") {
         const iframe = document.createElement('iframe');
         iframe.id = 'jx06iframe';
         iframe.allow = 'microphone;camera;';
@@ -170,4 +170,4 @@ setTimeout(() => {
         iframe.src = chrome.runtime.getURL('ToDoList.html');
         document.body.appendChild(iframe);
     }
-}, 1000);
+}, 10);

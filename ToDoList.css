@@ -1,10 +1,248 @@
-#list1 .form-control {
-    border-color: transparent;
-  }
-  #list1 .form-control:focus {
-    border-color: transparent;
-    box-shadow: none;
-  }
-  #list1 .select-input.form-control[readonly]:not([disabled]) {
-    background-color: #fbfbfb;
-  }
+
+* {
+  font-family: 'Noto Sans TC', 'Noto Sans TC', '微軟正黑體', "sans-serif";
+}
+
+#BigDiv {
+  background-color: rgba(255, 255, 255, 0.97);
+  /* 半透明的背景顏色 */
+  /* height: 100vh; */
+  /* width: 100vw; */
+  min-height: 100vh;
+
+}
+
+.LR {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.UD {
+  display: flex;
+  flex-flow: column;
+}
+
+#BigDiv>div {
+  margin: 20px;
+}
+
+#BigDiv>div>div {
+  margin: 20px;
+  margin-top: 10px;
+}
+
+/* -------------------------------------------------------------- */
+
+.Mytextarea1 {
+  text-align: left;
+  border: none;
+  resize: none;
+  box-sizing: border-box;
+  outline: none;
+  margin-top: 10px;
+  margin-left: 12px;
+  margin-right: 12px;
+  margin-bottom: 6px;
+  font-size: 18px;
+
+}
+
+#notes {
+  border-spacing: 30px 5px;
+}
+
+.note {
+  background-color: #fff3ac;
+}
+
+
+.aNote {
+  background-color: #fff3ac;
+  clip-path: polygon(calc(100% - 18px) 0%,
+      100% 18px,
+      100% 100%,
+      0% 100%,
+      0% 0%);
+}
+
+.TimeAndDelete {
+  background-color: #fff3ac;
+  text-align: right;
+  display: block;
+  padding-right: 10px;
+  padding-bottom: 5px;
+  font-size: 16px;
+}
+
+.deleteNote {
+  background-color: #fff3ac;
+  text-align: left;
+  margin-right: 138px;
+  font-size: 22px;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 5px;
+  font-weight: 590;
+}
+
+.deleteNote:hover {
+  color: #f00;
+}
+
+.NewNote .Mytextarea1 {
+  color: #4e4e4e;
+}
+
+.NewNote .deleteNote {
+  background-color: #fdf9d9;
+  text-align: left;
+  margin-right: 126px;
+  font-size: 24px;
+  cursor: pointer;
+  user-select: none;
+  color: #cecece;
+}
+
+.NewNote .aNote {
+  background-color: #fdf9d9;
+}
+
+.NewNote .TimeAndDelete {
+  background-color: #fdf9d9;
+  color: #afafaf;
+}
+
+.NewNote .note {
+  background-color: #fdf9d9;
+}
+
+/* ---------------------------------------------------------- */
+table {
+  margin-right: 30px;
+}
+
+th {
+  font-size: 20px;
+  border-style: none none solid none;
+  border-color: #555;
+  width: 300px;
+}
+
+tr {
+  display: block;
+  margin-bottom:10px;
+}
+td{
+  border-radius: 1px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  clip-path: polygon(calc(100% - 18px) 0%,
+  100% 18px,
+  101% 101%,
+  -1% 101%,
+  -1% -1%);
+}
+/* ------------------------------------------------------- */
+
+h2 {
+  font-size: 20px;
+  text-align: center;
+  border-style: none none solid none;
+  border-color: #555;
+  margin: 7px;
+}
+
+.Myinput1 {
+  border: none;
+  resize: none;
+  box-sizing: border-box;
+  outline: none;
+  background-color: #f9f9f9;
+  width: 230px;
+}
+
+.todo-list {
+  list-style: none;
+  padding: 0;
+}
+
+.todo-item {
+  align-items: center;
+  justify-content: space-between;
+  /* word-wrap:break-word; */
+  margin-bottom: 20px;
+  padding: 9px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.todo-text {
+  flex-grow: 1;
+  font-size: 20px;
+}
+
+.todo-time {
+  white-space:nowrap;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #777;
+  cursor: pointer;
+  user-select: none;
+}
+
+.todo-item:hover {
+  background-color: #eeeeee;
+}
+
+.todo-item:hover .Myinput1 {
+  background-color: #eeeeee;
+}
+
+.NewTodo.todo-item:hover .Myinput1 {
+  background-color: #ffffff;
+}
+
+.NewTodo.todo-item {
+  background-color: #ffffff;
+  box-shadow: 0 0px 1px rgba(0, 0, 0, 0.1);
+}
+
+.NewTodo .todo-text {
+  background-color: #ffffff;
+  color: #777;
+}
+
+.todo-state {
+  user-select: none;
+}
+
+.todo-state.S1 {
+  font-size: 26px;
+  margin-right: 10px;
+  color: #a1ddff;
+}
+
+.todo-state.S2 {
+  margin-right: 10px;
+  margin-left: 5px;
+  font-size: 26px;
+  color: #30f000;
+  font-weight: 700;
+
+}
+
+.todo-state.S3 {
+  margin-right: 10px;
+  margin-left: 5px;
+  font-size: 26px;
+  color: #f00000;
+  font-weight: 600;
+}
+
+.todo-state.S4 {
+  margin-right: 10px;
+  margin-left: 0px;
+  font-size: 26px;
+  color: #ffa600;
+  font-weight: 800;
+}
