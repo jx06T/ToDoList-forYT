@@ -48,7 +48,7 @@ TodoList.addEventListener("click", () => {
     const target = event.target;
     // console.log(target)
     if (target.classList.contains('todo-state')) {
-        console.log(target.innerText)
+        // console.log(target.innerText)
         const newState = states[target.innerText]
         target.innerText = newState[0]
         target.classList.remove(newState[1])
@@ -59,7 +59,7 @@ TodoList.addEventListener("click", () => {
 TodoList.addEventListener("input", () => {
     const target = event.target;
     const parent = target.parentNode
-    console.log(target, parent)
+    // console.log(target, parent)
     if (parent.classList.contains('NewTodo')) {
         parent.classList.remove('NewTodo')
         parent.parentNode.appendChild(GetNewTodo())
