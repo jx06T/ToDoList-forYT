@@ -135,9 +135,11 @@ tr:not(.NewNote) td:hover .deleteNote {
 table {
   margin-right: 30px;
 }
-tbody{
+
+tbody {
   height: 0;
 }
+
 th {
   font-size: 20px;
   border-style: none none solid none;
@@ -211,6 +213,14 @@ h2 {
   user-select: none;
   width: 80px;
   text-align: right;
+  display: inline-block;
+}
+
+@media (max-width: 1221px) {
+  .todo-time {
+    text-align: left;
+    margin-left: 8px;
+  }
 }
 
 .todo-item:hover {
@@ -290,9 +300,12 @@ h2 {
   font-weight: bold;
   visibility: visible;
   display: absolute;
-  top: 0; /* 與父元素上方對齊 */
-  left: 0; /* 與父元素左側對齊 */
-  z-index: 1; /* 設定較高的堆疊順序，覆蓋文字內容 */
+  top: 0;
+  /* 與父元素上方對齊 */
+  left: 0;
+  /* 與父元素左側對齊 */
+  z-index: 1;
+  /* 設定較高的堆疊順序，覆蓋文字內容 */
 }
 
 .todo-state.DD:hover::before {

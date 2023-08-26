@@ -216,6 +216,7 @@ TodoList.addEventListener("input", (event) => {
     if (parent.classList.contains('NewTodo')) {
         parent.classList.remove('NewTodo')
         parent.querySelector(".todo-time").innerText = "1 hr"
+        parent.querySelector(".todo-time").dataset.time = 60
         parent.parentNode.appendChild(GetNewTodo())
         AllTodo.push({
             text: target.value, time: 60, states: "★"
