@@ -9,6 +9,12 @@ function InitData() {
 	chrome.storage.local.set({
 		Blockade: [{ tag: 'YT', advance: 3, limit: [3, 6], rest: [20, 5], impacted: ["claude", "", ""], restricted: true, disabled: [["23:00", "08:00"], ["11:00", "13:00"]] }, { tag: 'ChatGPT', advance: 3, limit: [5, 12], rest: [5, 0], restricted: false, impacted: ["", "", ""], disabled: [["23:00", "08:00"], ["23:00", "08:00"]] }]
 	})
+	chrome.storage.local.set({
+		AllTodo: [{ text: "背單字", time: "10 min", state: "★" }, { text: "寫作業", time: "1 hr", state: "！" }]
+	})
+	chrome.storage.local.set({
+		AllNote: [{ text: '單字\napple\norange\nbanana', time: "2023/08/25 20:15" }, { text: '作業\n數學\n生物\n模考', time: "2023/08/26 08:15" }]
+	})
 }
 
 async function UpData() {
@@ -228,6 +234,12 @@ chrome.alarms.onAlarm.addListener(alarm => {
 //-------------------------------------------------------------------------------------------------------------------------
 
 function DeBugResetData() {
+	chrome.storage.local.set({
+		AllTodo: [{ text: "背單字", time: 10, state: "★" }, { text: "寫作業", time: 60, state: "！" }]
+	})
+	chrome.storage.local.set({
+		AllNote: [{ text: '單字\napple\norange\nbanana', time: "2023/08/25 20:15" }, { text: '作業\n數學\n生物\n模考\n很多多', time: "2023/08/26 08:15" }]
+	})
 	let today = new Date()
 	chrome.storage.local.set({ AllBrowsingTime: { Date: ["08/18", 5], BrowsingTime: { code: { _total_: 7 * 3600000, "github.com": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } } })
 	// chrome.storage.local.set({ AllBrowsingTime: { Date: [GetMyDay(today), today.getDay()], BrowsingTime: {} } })

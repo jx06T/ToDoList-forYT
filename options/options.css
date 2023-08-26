@@ -276,7 +276,8 @@ input:checked+.slider:before {
 
 /* 開關------------------------------------------------------------------------------------ */
 .form {
-    animation: showDiv 0.2s forwards;
+    /* animation: showDiv 0.2s forwards; */
+    animation: showDiv 0.2s;
     background-color: rgba(240, 240, 240, 0.9);
     width: 600px;
     height: 300px;

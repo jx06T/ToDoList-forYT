@@ -72,11 +72,11 @@ tr:not(.NewNote) td:hover .aNote {
   background-color: #fce97f;
 }
 
-tr:not(.NewNote) td:hover .TimeAndDelete  {
+tr:not(.NewNote) td:hover .TimeAndDelete {
   background-color: #fce97f;
 }
 
-tr:not(.NewNote) td:hover .deleteNote  {
+tr:not(.NewNote) td:hover .deleteNote {
   background-color: #fce97f;
 }
 
@@ -135,7 +135,9 @@ tr:not(.NewNote) td:hover .deleteNote  {
 table {
   margin-right: 30px;
 }
-
+tbody{
+  height: 0;
+}
 th {
   font-size: 20px;
   border-style: none none solid none;
@@ -191,6 +193,8 @@ h2 {
   background-color: #edfcff;
   border-radius: 5px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+  /* display: flex; */
 }
 
 .todo-text {
@@ -205,6 +209,8 @@ h2 {
   color: #777;
   cursor: pointer;
   user-select: none;
+  width: 80px;
+  text-align: right;
 }
 
 .todo-item:hover {
@@ -222,6 +228,10 @@ h2 {
 .NewTodo.todo-item {
   background-color: #f9ffff;
   box-shadow: 0 0px 1px rgba(0, 0, 0, 0.1);
+}
+
+.sliding .todo-text {
+  visibility: hidden;
 }
 
 .NewTodo .todo-text {
@@ -262,4 +272,43 @@ h2 {
   font-size: 26px;
   color: #ffa600;
   font-weight: 800;
+}
+
+.todo-state.DD {
+  margin-right: -13px;
+  margin-left: 5px;
+  font-size: 26px;
+  color: #810000;
+  font-weight: 800;
+  visibility: hidden;
+  position: relative;
+}
+
+.todo-state.DD::before {
+  color: #810000;
+  content: "🗑︎";
+  font-weight: bold;
+  visibility: visible;
+  display: absolute;
+  top: 0; /* 與父元素上方對齊 */
+  left: 0; /* 與父元素左側對齊 */
+  z-index: 1; /* 設定較高的堆疊順序，覆蓋文字內容 */
+}
+
+.todo-state.DD:hover::before {
+  color: #ff0000;
+}
+
+.NewTodo .todo-state {
+  filter: grayscale(50%);
+}
+
+.TimeSliders {
+  position: absolute;
+  left: 45%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  /* width: calc(65%-5px); */
+  width: 60%;
+  margin-top: 5px;
 }
