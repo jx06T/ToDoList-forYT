@@ -179,6 +179,12 @@ TodoList.addEventListener("click", (event) => {
         parent.querySelector(".todo-state").classList.remove("DD")
     }
     if (target.classList.contains('todo-time')) {
+        let s1 = TodoList.querySelector(".sliding")
+        if (s1 != null) {
+            s1.querySelector("#TimeSlider").remove()
+            s1.classList.remove("sliding")
+            s1.querySelector(".todo-state").classList.remove("DD")
+        }
         const TimeSlider = document.createElement("input")
         TimeSlider.type = "range"
         TimeSlider.min = "0"
@@ -201,12 +207,12 @@ TodoList.addEventListener("click", (event) => {
                 document.body.removeEventListener('click', listen1);
             }
         }
-        document.body.addEventListener("click", listen1)
         TimeSlider.addEventListener("input", () => {
             target.innerText = timeIntervalStrings[Number(TimeSlider.value)]
             target.dataset.time = timeIntervals[Number(TimeSlider.value)]
             // target.innerText = GetTextTime(timeIntervals[Number(TimeSlider.value)])
         })
+        document.body.addEventListener("click", listen1)
     }
 })
 TodoList.addEventListener("input", (event) => {
