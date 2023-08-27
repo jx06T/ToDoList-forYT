@@ -318,10 +318,10 @@ h2 {
 
 .TimeSliders {
   position: absolute;
-  left: 45%;
+  left: 42%;
   top: 50%;
   transform: translate(-50%, -50%);
   /* width: calc(65%-5px); */
-  width: 60%;
+  width: 58%;
   margin-top: 5px;
 }

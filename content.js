@@ -4,19 +4,32 @@ let Title = TitleT.innerText
 let Mytag = "ELSE"
 let Mytags = ["ALL"]
 let Jumping_in_line_count = 0
-GetTag()
-
+let isBlock = false
+let AllRule = []
+function InitData() {
+    chrome.storage.local.get("AllRule").then((r) => {
+        AllRule = r.AllRule
+        GetTag()
+    })
+}
+chrome.storage.onChanged.addListener(function (changes, areaName) {
+    if (areaName === 'local') {
+        if (changes.AllRule) {
+            AllRule = changes.AllRule.newValue;
+            GetTag()
+        }
+    }
+});
+InitData()
 let isOnFocus = true
 let moveCount = 0;
 let MovementCount = 0
-async function GetTag() {
+function GetTag() {
     Mytag = "ELSE"
     Mytags = []
     Mytags.push("ALL")
     Title = TitleT.innerText
     const Myhostname = location.href + "\n" + Title
-    const r = await chrome.storage.local.get("AllRule");
-    const AllRule = r.AllRule;
     for (let i = 0; i < AllRule.length; i++) {
         const aTag = AllRule[i];
         if (aTag.deactivate) {
@@ -123,9 +136,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (Title != TitleT.innerText) {
                 GetTag()
             }
+            checkBlock(request.Blockings)
             let isPlayingVideoo = isPlayingVideo()
             let isMouseMoveo = isMouseMove()
-            // console.log(isPlayingVideoo, isOnFocus, isMouseMoveo)
             if (!request.isSomeonePlayVideo) {
                 if (isMouseMoveo) {
                     chrome.runtime.sendMessage({ action: "Alive", tag: Mytag, isSomeonePlayVideo: isPlayingVideoo })
@@ -157,17 +170,22 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 })
 chrome.runtime.sendMessage({ action: "Add_url" })
-
-
-setTimeout(() => {
-    console.log(Mytags)
-    if (Mytag == "XX") {
-        const iframe = document.createElement('iframe');
-        iframe.id = 'jx06iframe';
-        iframe.allow = 'microphone;camera;';
-        iframe.sandbox = 'allow-scripts allow-same-origin allow-forms';
-        iframe.setAttribute('allowFullScreen', '');
-        iframe.src = chrome.runtime.getURL('ToDoList.html');
+let iframe = document.createElement('iframe');
+iframe.classList.add("NO")
+iframe.id = 'jx06iframe';
+iframe.allow = 'microphone;camera;';
+iframe.sandbox = 'allow-scripts allow-same-origin allow-forms';
+iframe.setAttribute('allowFullScreen', '');
+iframe.src = chrome.runtime.getURL('ToDoList.html');
+function checkBlock(B) {
+    console.log(B, isBlock)
+    if (B[Mytag] != undefined && isBlock == false) {
+        console.log(B[Mytag].text, B[Mytag].time)
+        isBlock = true
         document.body.appendChild(iframe);
+    } else if (B[Mytag] == undefined && isBlock) {
+        isBlock = false
+        iframe.remove()
     }
-}, 10);
+}
+

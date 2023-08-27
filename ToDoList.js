@@ -116,16 +116,18 @@ function NoteI(event) {
         UpDataId(0)
         UpData()
     }
-    NoteCh(event)
+    NoteCh(event,1)
 }
-function NoteCh(event) {
+function NoteCh(event,t) {
     const target = event.target;
     const parent = target.parentNode.parentNode.parentNode
     if (target.classList.contains("Mytextarea1") && !parent.classList.contains('NewNote')) {
         const timestamp = parent.querySelector(".timestamp")
         const index = Number(parent.dataset.index)
-        timestamp.innerText = GetNowTime()
-        AllNote[index].time = timestamp.innerText
+        if (!t) {
+            timestamp.innerText = GetNowTime()
+            AllNote[index].time = timestamp.innerText
+        }
         AllNote[index].text = target.value
         UpData()
     }
@@ -315,7 +317,7 @@ function GetNewTodo(text = "", time = "－－－", state = '★', i = -1) {
     ul.appendChild(a2);
     return ul
 }
-chrome.runtime.sendMessage({ action: "test", TestText: "ddd" })
+// chrome.runtime.sendMessage({ action: "test", TestText: "ddd" })
 
 function GetNowTime() {
     const now = new Date();

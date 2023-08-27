@@ -180,7 +180,7 @@ function calculationBT(BrowsingTime, t = 0) {
         }
         AllLabels.push(key)
         colors.push(getColorByTag(key))
-        AllTime.push((BrowsingTime[key]._total_ / 60000).toFixed(2))
+        AllTime.push((BrowsingTime[key]._total_ / 60).toFixed(2))
     }
 
     return [AllTime, AllLabels, colors]
@@ -197,14 +197,14 @@ function CaWeekBT(data) {
         }
         aDay = data[key]
         if (aDay.BrowsingTime == null) {
-            totals.push((TodayTotal / 3600000).toFixed(2))
+            totals.push((TodayTotal / 3600).toFixed(2))
             titles.push(aDay.Date)
             continue
         }
         for (let key2 in aDay.BrowsingTime) {
             total += aDay.BrowsingTime[key2]._total_;
         }
-        total = (total / 3600000).toFixed(2)
+        total = (total / 3600).toFixed(2)
         totals.push(total)
         titles.push(aDay.Date)
     }

@@ -17,6 +17,7 @@ function InitData() {
 	})
 }
 
+let ThisBrowsingTime = {}
 async function UpData() {
 	let today = new Date();
 	const r1 = await chrome.storage.local.get("LastUpDataTime")
@@ -60,10 +61,11 @@ function GetMyDay(today) {
 chrome.runtime.onStartup.addListener(() => {
 	UpData()
 	chrome.alarms.create('midnight', { when: getMidnight() });
+	chrome.tabs.create({ url: chrome.runtime.getURL('options\\options.html') });
 });
 chrome.runtime.onInstalled.addListener(() => {
 	UpData()
-	// chrome.tabs.create({ url: "extension://epoagflebjghjoehflcmddeabilfgaph/options.html#rules" });
+	chrome.tabs.create({ url: chrome.runtime.getURL('options\\options.html') });
 })
 
 function getMidnight() {
@@ -78,12 +80,13 @@ let EnterTime = Date.now()
 let okId = []
 let SomeonePlayVideo = false
 let PlayVideo_Tab = undefined
+let count = 0
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	let A = request.action
 	const TabId = sender.tab.id
 	const dns = new URL(sender.origin).hostname;
-	// console.log(sender)
+	// console.log(request, sender)
 	switch (A) {
 		case "test":
 			console.log("!!!!!", sender, request.TestText)
@@ -137,8 +140,8 @@ function AddTime(tag, dns, title) {
 	if (tag == null) {
 		return
 	}
-	// console.log(tag, dns, title)
-	let BrowsingTime = Date.now() - EnterTime
+	console.log(tag)
+	let BrowsingTime = (Date.now() - EnterTime) / 1000
 	chrome.storage.local.get(["AllBrowsingTime"]).then((result) => {
 		let rBrowsingTime = result.AllBrowsingTime
 		let OldAllBrowsingTime = rBrowsingTime.BrowsingTime
@@ -150,13 +153,15 @@ function AddTime(tag, dns, title) {
 		OldAllBrowsingTime[tag]._total_ += BrowsingTime
 		OldAllBrowsingTime[tag][dns]._total_ += BrowsingTime
 		OldAllBrowsingTime[tag][dns][title] += BrowsingTime
-
 		chrome.storage.local.set({ AllBrowsingTime: rBrowsingTime })
+		ThisBrowsingTime = OldAllBrowsingTime
+		// ThisBrowsingTime =  JSON.parse(JSON.stringify(OldAllBrowsingTime))
+		// console.log(ThisBrowsingTime)
 	})
 	EnterTime = Date.now()
 }
 
-function doTask() {
+function doTask(B) {
 	if (ActivePages.length > 0) {
 		AddTime(ActivePages[0].tag, ActivePages[0].dns, ActivePages[0].title)
 		ActivePages = []
@@ -183,9 +188,11 @@ function doTask() {
 					if (tabs.length > 0) {
 						let aTab = tabs[0];
 						if (okId.indexOf(aTab.id) != -1) {
-							chrome.tabs.sendMessage(aTab.id, { action: "CheckYou", isSomeonePlayVideo: SomeonePlayVideo });
+							chrome.tabs.sendMessage(aTab.id, { Blockings: B, action: "CheckYou", isSomeonePlayVideo: SomeonePlayVideo });
 						} else {
-							ELSE(aTab)
+							setTimeout(() => {
+								ELSE(aTab)
+							}, 10);
 						}
 					}
 				});
@@ -197,6 +204,9 @@ function ELSE(aTab) {
 	// console.log(aTab)
 	chrome.storage.local.get("AllRule").then((a) => {
 		let Mytag = "ELSE"
+		// if (aTab.url.includes("file:")) {
+		// 	Mytag = "FILE"
+		// }
 		const AllRule = a.AllRule;
 		const dns = new URL(aTab.url).hostname;
 		for (let i = 0; i < AllRule.length; i++) {
@@ -224,13 +234,66 @@ chrome.alarms.create('readLoop', { periodInMinutes: 3 / 60 });
 
 chrome.alarms.onAlarm.addListener(alarm => {
 	if (alarm.name === 'readLoop') {
-		doTask();
+		// count++
+		doTask(doBlock());
 	}
 	if (alarm.name === 'midnight') {
 		UpData()
 		chrome.alarms.create('midnight', { when: getMidnight() });
 	}
 });
+//-------------------------------------------------------------------------------------------------------------------------
+let BlockRecord = []
+let Blockade = []
+chrome.storage.local.get("Blockade").then((a) => {
+	Blockade = a.Blockade;
+	BlockRecord = Blockade
+})
+chrome.storage.local.get(["AllBrowsingTime"]).then((result) => {
+	ThisBrowsingTime = result.AllBrowsingTime.BrowsingTime;
+})
+chrome.storage.onChanged.addListener(function (changes, areaName) {
+	if (areaName === 'local') {
+		if (changes.Blockade) {
+			Blockade = changes.Blockade.newValue;
+			BlockRecord = Blockade
+		}
+	}
+});
+function doBlock() {
+	let Blockings = {}
+	// console.log(ThisBrowsingTime)
+	// console.log(ActivePages)
+	// console.log(Blockade)
+	for (let i = 0; i < Blockade.length; i++) {
+		const aB = Blockade[i];
+		const tag = aB.tag
+		if (ThisBrowsingTime[tag] == undefined) {
+			continue
+		}
+		if (BlockRecord[i].LastTime == undefined) {
+			BlockRecord[i].LastTime = 0
+			BlockRecord[i].isB = false
+		}
+		if (!BlockRecord[i].isB && ThisBrowsingTime[tag]._total_ - BlockRecord[i].LastTime > aB.rest[0] * 60) {
+			BlockRecord[i].LastTime = Date.now() / 1000
+			console.log(BlockRecord[i], "isNotB")
+			BlockRecord[i].isB = true
+		}
+		if (BlockRecord[i].isB && (Date.now() / 1000) - BlockRecord[i].LastTime > aB.rest[1] * 60) {
+			console.log(BlockRecord[i], "isB")
+			BlockRecord[i].isB = false
+			BlockRecord[i].LastTime = ThisBrowsingTime[tag]._total_
+		}
+		if (BlockRecord[i].isB) {
+			Blockings[tag] = {}
+			Blockings[tag].text = "休息時間到"
+			Blockings[tag].time = aB.rest[1]
+		}
+	}
+	// console.log(BlockRecord)
+	return Blockings
+}
 //-------------------------------------------------------------------------------------------------------------------------
 
 function DeBugResetData() {
@@ -241,29 +304,30 @@ function DeBugResetData() {
 		AllNote: [{ text: '單字\napple\norange\nbanana', time: "2023/08/25 20:15" }, { text: '作業\n數學\n生物\n模考\n很多多', time: "2023/08/26 08:15" }]
 	})
 	let today = new Date()
-	chrome.storage.local.set({ AllBrowsingTime: { Date: ["08/18", 5], BrowsingTime: { code: { _total_: 7 * 3600000, "github.com": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } } })
+	chrome.storage.local.set({ AllBrowsingTime: { Date: ["08/26", 6], BrowsingTime: { code: { _total_: 7 * 3600, "github.com": { _total_: 5 * 3600, "jx06T/ToDoList-forYT": 3 * 3600 } } } } })
 	// chrome.storage.local.set({ AllBrowsingTime: { Date: [GetMyDay(today), today.getDay()], BrowsingTime: {} } })
-	chrome.storage.local.set({ LastUpDataTime: ["08/18", 5] })
+	chrome.storage.local.set({ LastUpDataTime: ["08/26", 6] })
 	// chrome.storage.local.set({ LastUpDataTime: GetMyDay(today) })
 	// return
 	chrome.storage.local.set({
 		aWeek:
 			[{
-				0: { Date: "07/23", BrowsingTime: { code: { _total_: 7 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
-				1: { Date: "07/24", BrowsingTime: { code: { _total_: 6 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
-				2: { Date: "07/25", BrowsingTime: { code: { _total_: 5 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
-				3: { Date: "07/26", BrowsingTime: { code: { _total_: 4 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
-				4: { Date: "07/27", BrowsingTime: { code: { _total_: 3 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
-				5: { Date: "07/28", BrowsingTime: { code: { _total_: 2 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
-				6: { Date: "07/29", BrowsingTime: { code: { _total_: 1 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } }
+				0: { Date: "07/23", BrowsingTime: { code: { _total_: 7 * 3600, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				1: { Date: "07/24", BrowsingTime: { code: { _total_: 6 * 3600, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				2: { Date: "07/25", BrowsingTime: { code: { _total_: 5 * 3600, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				3: { Date: "07/26", BrowsingTime: { code: { _total_: 4 * 3600, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				4: { Date: "07/27", BrowsingTime: { code: { _total_: 3 * 3600, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				5: { Date: "07/28", BrowsingTime: { code: { _total_: 2 * 3600, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				6: { Date: "07/29", BrowsingTime: { code: { _total_: 1 * 3600, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } }
 			},
 			{
-				0: { Date: "07/30", BrowsingTime: { code: { _total_: 7 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
-				1: { Date: "08/01", BrowsingTime: { code: { _total_: 6 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
-				2: { Date: "08/02", BrowsingTime: { code: { _total_: 5 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
-				3: { Date: "08/03", BrowsingTime: { code: { _total_: 4 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
-				4: { Date: "08/04", BrowsingTime: { code: { _total_: 3 * 3600000, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
-				5: { Date: "08/05", BrowsingTime: null },
+				0: { Date: "07/30", BrowsingTime: { code: { _total_: 7 * 3600, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				1: { Date: "08/01", BrowsingTime: { code: { _total_: 6 * 3600, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				2: { Date: "08/02", BrowsingTime: { code: { _total_: 5 * 3600, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				3: { Date: "08/03", BrowsingTime: { code: { _total_: 4 * 3600, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				4: { Date: "08/04", BrowsingTime: { code: { _total_: 3 * 3600, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				5: { Date: "08/05", BrowsingTime: { code: { _total_: 3 * 3600, "https://github.com/": { _total_: 5 * 3600000, "jx06T/ToDoList-forYT": 3 * 3600000 } } } },
+				6: { Date: "08/26", BrowsingTime: null },
 			}]
 	})
 }

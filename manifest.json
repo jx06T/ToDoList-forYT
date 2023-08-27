@@ -28,7 +28,7 @@
    ],
    "permissions": [
       "tabs",
-      "scrispting",
+      "scripting",
       "activeTab",
       "storage",
       "alarms"
@@ -36,8 +36,7 @@
    "host_permissions": [
       "https://app.simplenote.com/publish/*",
       "http://*/*",
-      "https://*/*",
-      "chrome-extension://epoagflebjghjoehflcmddeabilfgaph/TEST.html"
+      "https://*/*"
    ],
    "icons": {
       "16": "images/ToDoYT16.png",
