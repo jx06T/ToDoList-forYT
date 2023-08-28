@@ -196,16 +196,16 @@ class BlockadeMM {
                     target.style.color = this.TagToColor[target.value] ? this.TagToColor[target.value] : "#000"
                     break
                 case "rest1":
-                    aTag.rest[0] = target.value
+                    aTag.rest[0] = parseFloat(target.value)
                     break;
                 case "rest2":
-                    aTag.rest[1] = target.value
+                    aTag.rest[1] = parseFloat(target.value)
                     break;
                 case "limit1":
-                    aTag.limit[0] = target.value
+                    aTag.limit[0] = parseFloat(target.value)
                     break;
                 case "limit2":
-                    aTag.limit[1] = target.value
+                    aTag.limit[1] = parseFloat(target.value)
                     break;
                 case "":
                     var j = -1

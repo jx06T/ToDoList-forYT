@@ -13,6 +13,9 @@ function InitData() {
 		AllTodo: [{ text: "背單字", time: "10 min", state: "★" }, { text: "寫作業", time: "1 hr", state: "！" }]
 	})
 	chrome.storage.local.set({
+		isBlocking: {}
+	})
+	chrome.storage.local.set({
 		AllNote: [{ text: '單字\napple\norange\nbanana', time: "2023/08/25 20:15" }, { text: '作業\n數學\n生物\n模考', time: "2023/08/26 08:15" }]
 	})
 }
@@ -257,7 +260,7 @@ chrome.storage.onChanged.addListener(function (changes, areaName) {
 		if (changes.Blockade) {
 			Blockade = changes.Blockade.newValue;
 			BlockRecord = Blockade
-		}
+		} 
 	}
 });
 function doBlock() {
@@ -268,32 +271,127 @@ function doBlock() {
 	for (let i = 0; i < Blockade.length; i++) {
 		const aB = Blockade[i];
 		const tag = aB.tag
-		if (ThisBrowsingTime[tag] == undefined) {
+		if (ThisBrowsingTime[tag] == undefined || aB.restricted == false) {
 			continue
 		}
 		if (BlockRecord[i].LastTime == undefined) {
 			BlockRecord[i].LastTime = 0
+			BlockRecord[i].LLastUT = Date.now() / 1000
+			BlockRecord[i].LLastBT = 0
 			BlockRecord[i].isB = false
+			BlockRecord[i].isL = false
+			BlockRecord[i].isD = false
 		}
-		if (!BlockRecord[i].isB && ThisBrowsingTime[tag]._total_ - BlockRecord[i].LastTime > aB.rest[0] * 60) {
+
+		if (aB.rest[0] != "" && !BlockRecord[i].isB && ThisBrowsingTime[tag]._total_ - BlockRecord[i].LastTime > aB.rest[0] * 60) {
 			BlockRecord[i].LastTime = Date.now() / 1000
-			console.log(BlockRecord[i], "isNotB")
 			BlockRecord[i].isB = true
 		}
 		if (BlockRecord[i].isB && (Date.now() / 1000) - BlockRecord[i].LastTime > aB.rest[1] * 60) {
-			console.log(BlockRecord[i], "isB")
 			BlockRecord[i].isB = false
 			BlockRecord[i].LastTime = ThisBrowsingTime[tag]._total_
 		}
+
+		if (aB.limit[0] != "" && !BlockRecord[i].isL && ThisBrowsingTime[tag]._total_ - BlockRecord[i].LLastBT > aB.limit[0] * 3600) {
+			BlockRecord[i].isL = true
+			console.log("sssss")
+		}
+		if (BlockRecord[i].isL && (Date.now() / 1000) - BlockRecord[i].LLastUT > aB.limit[1] * 3600) {
+			BlockRecord[i].isL = false
+			BlockRecord[i].LLastUT = Date.now() / 1000
+			BlockRecord[i].LLastBT = ThisBrowsingTime[tag]._total_
+			console.log("FF")
+		}
+		console.log(BlockRecord,ThisBrowsingTime[tag]._total_)
+
+		for (let j = 0; j < aB.disabled.length; j++) {
+			const aD = aB.disabled[j];
+			if (isTimeInRange(aD[0], aD[1])) {
+				BlockRecord[i].isD = true
+			} else {
+				BlockRecord[i].isD = false
+			}
+		}
+
 		if (BlockRecord[i].isB) {
 			Blockings[tag] = {}
 			Blockings[tag].text = "休息時間到"
 			Blockings[tag].time = aB.rest[1]
+			for (let i = 0; i < aB.impacted.length; i++) {
+				const item = aB.impacted[i];
+				if (item == "") {
+					continue
+				}
+				if (Blockings[item] == undefined) {
+					Blockings[item] = {}
+					Blockings[item].text = "被休息影響了"
+					Blockings[item].name = tag
+					Blockings[item].time = aB.rest[1]
+				}
+			}
+		}
+		if (BlockRecord[i].isL) {
+			Blockings[tag] = {}
+			Blockings[tag].text = "達到使用極限"
+			Blockings[tag].time = aB.limit[1]
+			for (let i = 0; i < aB.impacted.length; i++) {
+				const item = aB.impacted[i];
+				if (item == "") {
+					continue
+				}
+				if (Blockings[item] == undefined) {
+					Blockings[item] = {}
+					Blockings[item].text = "被極限影響了"
+					Blockings[item].name = tag
+					Blockings[item].time = aB.rest[1]
+				}
+			}
+		}
+		if (BlockRecord[i].isD) {
+			Blockings[tag] = {}
+			Blockings[tag].text = "禁用時間"
+			Blockings[tag].time = aB.disabled
+			for (let i = 0; i < aB.impacted.length; i++) {
+				const item = aB.impacted[i];
+				if (item == "") {
+					continue
+				}
+				if (Blockings[item] == undefined) {
+					Blockings[item] = {}
+					Blockings[item].text = "被禁用影響了"
+					Blockings[item].name = tag
+					Blockings[item].time = aB.disabled
+				}
+			}
 		}
 	}
 	// console.log(BlockRecord)
+	chrome.storage.local.set({
+		isBlocking: Blockings
+	})
 	return Blockings
 }
+function isTimeInRange(startTime, endTime) {
+	const today = new Date()
+	const hour = today.getHours()
+	const min = today.getMinutes()
+
+	const startHours = Number(startTime.split(':')[0]);
+	const startMinutes = Number(startTime.split(':')[1]);
+	const endHours = Number(endTime.split(':')[0]);
+	const endMinutes = Number(endTime.split(':')[1]);
+
+	const start = startHours * 60 + startMinutes;
+	let end = endHours * 60 + endMinutes;
+	const check = hour * 60 + min;
+	if (end < start) {
+		end += (24 * 60);
+	}
+
+	return start <= check && check <= end;
+
+}
+
 //-------------------------------------------------------------------------------------------------------------------------
 
 function DeBugResetData() {
