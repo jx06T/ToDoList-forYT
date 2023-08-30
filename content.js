@@ -4,7 +4,7 @@ let Title = TitleT.innerText
 let Mytag = "ELSE"
 let Mytags = ["ALL"]
 let Jumping_in_line_count = 0
-let isBlock = false
+// let isBlock = false
 let AllRule = []
 function InitData() {
     chrome.storage.local.get("AllRule").then((r) => {
@@ -136,7 +136,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (Title != TitleT.innerText) {
                 GetTag()
             }
-            checkBlock(request.Blockings)
+            let isBlock = checkBlock()
+            doBlock(request.Blockings, isBlock)
+            if (isBlock) {
+                return
+            }
             let isPlayingVideoo = isPlayingVideo()
             let isMouseMoveo = isMouseMove()
             if (!request.isSomeonePlayVideo) {
@@ -169,6 +173,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             }
     }
 })
+function checkBlock() {
+    if (document.querySelector('#jx06iframe') == null) {
+        return false
+    } else {
+        return true
+    }
+}
 chrome.runtime.sendMessage({ action: "Add_url" })
 let iframe = document.createElement('iframe');
 iframe.classList.add("NO")
@@ -177,7 +188,7 @@ iframe.allow = 'microphone;camera;';
 iframe.sandbox = 'allow-scripts allow-same-origin allow-forms';
 iframe.setAttribute('allowFullScreen', '');
 iframe.src = chrome.runtime.getURL('ToDoList.html');
-function checkBlock(B) {
+function doBlock(B,isBlock) {
     console.log(B, isBlock)
     if (B[Mytag] != undefined && isBlock == false) {
         console.log(B[Mytag].text, B[Mytag].time)

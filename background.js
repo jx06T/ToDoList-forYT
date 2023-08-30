@@ -260,7 +260,7 @@ chrome.storage.onChanged.addListener(function (changes, areaName) {
 		if (changes.Blockade) {
 			Blockade = changes.Blockade.newValue;
 			BlockRecord = Blockade
-		} 
+		}
 	}
 });
 function doBlock() {
@@ -275,9 +275,9 @@ function doBlock() {
 			continue
 		}
 		if (BlockRecord[i].LastTime == undefined) {
-			BlockRecord[i].LastTime = 0
+			BlockRecord[i].LastTime = ThisBrowsingTime[tag]._total_
+			BlockRecord[i].LLastBT = ThisBrowsingTime[tag]._total_
 			BlockRecord[i].LLastUT = Date.now() / 1000
-			BlockRecord[i].LLastBT = 0
 			BlockRecord[i].isB = false
 			BlockRecord[i].isL = false
 			BlockRecord[i].isD = false
@@ -302,7 +302,7 @@ function doBlock() {
 			BlockRecord[i].LLastBT = ThisBrowsingTime[tag]._total_
 			console.log("FF")
 		}
-		console.log(BlockRecord,ThisBrowsingTime[tag]._total_)
+		console.log(BlockRecord, ThisBrowsingTime[tag]._total_)
 
 		for (let j = 0; j < aB.disabled.length; j++) {
 			const aD = aB.disabled[j];
