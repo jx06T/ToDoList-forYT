@@ -382,13 +382,13 @@ function isTimeInRange(startTime, endTime) {
 	const endMinutes = Number(endTime.split(':')[1]);
 
 	const start = startHours * 60 + startMinutes;
-	let end = endHours * 60 + endMinutes;
+	const end = endHours * 60 + endMinutes;
 	const check = hour * 60 + min;
 	if (end < start) {
-		end += (24 * 60);
+		return start <= check || check <= end;
+	} else {
+		return start <= check && check <= end;
 	}
-
-	return start <= check && check <= end;
 
 }
 
