@@ -116,9 +116,9 @@ function NoteI(event) {
         UpDataId(0)
         UpData()
     }
-    NoteCh(event,1)
+    NoteCh(event, 1)
 }
-function NoteCh(event,t) {
+function NoteCh(event, t) {
     const target = event.target;
     const parent = target.parentNode.parentNode.parentNode
     if (target.classList.contains("Mytextarea1") && !parent.classList.contains('NewNote')) {
@@ -357,3 +357,18 @@ function UpDataId(t = null) {
     }
 }
 InitData()
+const tag = document.querySelector("#tag")
+document.addEventListener('DOMContentLoaded', () => {
+    const hash = location.hash
+    console.log(hash.split("#")[1].slice(4))
+    tag.innerText = hash.split("#")[1].slice(4)
+});
+function doTask() {
+    isBlocking = a.isBlocking;
+    console.log(isBlocking)
+}
+setTimeout(() => {
+    chrome.storage.local.get("isBlocking").then((a) => {
+        doTask()
+    })
+}, 5000);

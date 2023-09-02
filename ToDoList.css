@@ -325,3 +325,39 @@ h2 {
   width: 58%;
   margin-top: 5px;
 }
+
+/* --------------------------------------------------------- */
+.signs {
+  background-color: #ffe6e6;
+  height: 300px;
+  width: 210px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  border: solid #ffe2e2 3px;
+
+  text-align: center;
+  font-size: 40px;
+  line-height: 300px;
+}
+
+
+.MyButton1 {
+  background-color: #ffffff;
+  border: solid 1px #0000008e;
+  border-radius: 5px;
+  font-size: 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  margin: 15px;
+  font-size: 20px;
+  background-color: #f2e7ff;
+}
+
+#text {
+  margin: 10px;
+  font-size: 20px;
+}
+
+h2.h22 {
+  border-color: #c3c3c3;
+}
