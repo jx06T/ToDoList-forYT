@@ -308,6 +308,8 @@ function doBlock() {
 			const aD = aB.disabled[j];
 			if (isTimeInRange(aD[0], aD[1])) {
 				BlockRecord[i].isD = true
+				Blockings[tag] = {}
+				Blockings[tag].time = aD[0] + "～" + aD[1]
 			} else {
 				BlockRecord[i].isD = false
 			}
@@ -315,7 +317,7 @@ function doBlock() {
 
 		if (BlockRecord[i].isB) {
 			Blockings[tag] = {}
-			Blockings[tag].text = "休息時間到"
+			Blockings[tag].text = "休息時間到（$ min）"
 			Blockings[tag].time = aB.rest[1]
 			for (let i = 0; i < aB.impacted.length; i++) {
 				const item = aB.impacted[i];
@@ -324,7 +326,7 @@ function doBlock() {
 				}
 				if (Blockings[item] == undefined) {
 					Blockings[item] = {}
-					Blockings[item].text = "被休息影響了"
+					Blockings[item].text = "被休息影響了（$ min）"
 					Blockings[item].name = tag
 					Blockings[item].time = aB.rest[1]
 				}
@@ -332,8 +334,8 @@ function doBlock() {
 		}
 		if (BlockRecord[i].isL) {
 			Blockings[tag] = {}
-			Blockings[tag].text = "達到使用極限"
-			Blockings[tag].time = aB.limit[1]
+			Blockings[tag].text = "達到使用極限（$）"
+			Blockings[tag].time = aB.limit[0] + '／' + aB.limit[1]
 			for (let i = 0; i < aB.impacted.length; i++) {
 				const item = aB.impacted[i];
 				if (item == "") {
@@ -341,16 +343,14 @@ function doBlock() {
 				}
 				if (Blockings[item] == undefined) {
 					Blockings[item] = {}
-					Blockings[item].text = "被極限影響了"
+					Blockings[item].text = "被極限影響了（$）"
 					Blockings[item].name = tag
-					Blockings[item].time = aB.rest[1]
+					Blockings[item].time = aB.limit[0] + '／' + aB.limit[1]
 				}
 			}
 		}
 		if (BlockRecord[i].isD) {
-			Blockings[tag] = {}
-			Blockings[tag].text = "禁用時間"
-			Blockings[tag].time = aB.disabled
+			Blockings[tag].text = "禁用時間$"
 			for (let i = 0; i < aB.impacted.length; i++) {
 				const item = aB.impacted[i];
 				if (item == "") {
@@ -358,9 +358,9 @@ function doBlock() {
 				}
 				if (Blockings[item] == undefined) {
 					Blockings[item] = {}
-					Blockings[item].text = "被禁用影響了"
+					Blockings[item].text = "被禁用影響了$"
 					Blockings[item].name = tag
-					Blockings[item].time = aB.disabled
+					Blockings[item].time = Blockings[tag].time
 				}
 			}
 		}
@@ -369,6 +369,7 @@ function doBlock() {
 	chrome.storage.local.set({
 		isBlocking: Blockings
 	})
+	// console.log(Blockings)
 	return Blockings
 }
 function isTimeInRange(startTime, endTime) {

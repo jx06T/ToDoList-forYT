@@ -11,6 +11,14 @@
 
 }
 
+#BigDiv.urgent {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+#BigDiv.urgent>* {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
 .LR {
   display: flex;
   flex-flow: row nowrap;
@@ -330,7 +338,8 @@ h2 {
 .signs {
   background-color: #ffe6e6;
   height: 300px;
-  width: 210px;
+  /* width: 210px; */
+  width: 100%;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   border: solid #ffe2e2 3px;
@@ -340,6 +349,9 @@ h2 {
   line-height: 300px;
 }
 
+.signs:hover {
+  background-color: #ffdede;
+}
 
 .MyButton1 {
   background-color: #ffffff;
@@ -348,9 +360,16 @@ h2 {
   font-size: 15px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
-  margin: 15px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin: 5px;
+  width: 50%;
   font-size: 20px;
-  background-color: #f2e7ff;
+  background-color: #ffe2e2;
+}
+
+.MyButton1:hover {
+  background-color: #facccc;
 }
 
 #text {

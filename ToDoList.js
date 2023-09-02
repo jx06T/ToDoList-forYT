@@ -357,18 +357,55 @@ function UpDataId(t = null) {
     }
 }
 InitData()
-const tag = document.querySelector("#tag")
+const BigD = document.querySelector("#BigDiv")
+const tagH = document.querySelector("#tag")
+const textD = document.querySelector("#text")
+const RandTasksD = document.querySelector("#RandomTasks")
+const RandTasks = ["吃飯", '跳繩', '鋼琴']
+const urgentB = document.querySelector("#urgent")
+urgentB.addEventListener('click', () => {
+    BigD.classList.add("urgent")
+    setTimeout(() => {
+        BigD.classList.remove("urgent")
+    }, 3000);
+})
+let text = ''
+let time = ""
+let Mytag = null
 document.addEventListener('DOMContentLoaded', () => {
     const hash = location.hash
-    console.log(hash.split("#")[1].slice(4))
-    tag.innerText = hash.split("#")[1].slice(4)
-});
-function doTask() {
-    isBlocking = a.isBlocking;
-    console.log(isBlocking)
-}
-setTimeout(() => {
+    if (hash == "") {
+        return
+    }
+    const tag = hash.split("#")[1].slice(4)
+    RandTasksD.innerText = RandTasks[Math.floor(Math.random() * RandTasks.length)]
+    tagH.innerText = tag
+    Mytag = tag
     chrome.storage.local.get("isBlocking").then((a) => {
-        doTask()
+        isBlocking = a.isBlocking;
+        console.log(isBlocking)
+        console.log(Mytag)
+        if (!isBlocking[Mytag]) {
+            return
+        }
+        text = isBlocking[Mytag].text
+        time = isBlocking[Mytag].time
+        if (isBlocking[Mytag].name) {
+            textD.innerText = text.replace("$", time) + "#" + isBlocking[Mytag].name
+        } else {
+            textD.innerText = text.replace("$", time)
+        }
     })
+});
+setInterval(() => {
+    let ttime = time
+    if (text == "休息時間到（$ min）" || text == "被休息影響了（$ min）") {
+        time = time - (5 / 60)
+        ttime = Math.abs(parseFloat(time).toFixed(2))
+    }
+    if (isBlocking[Mytag].name) {
+        textD.innerText = text.replace("$", ttime) + "#" + isBlocking[Mytag].name
+    } else {
+        textD.innerText = text.replace("$", ttime)
+    }
 }, 5000);

@@ -187,12 +187,13 @@ iframe.id = 'jx06iframe';
 iframe.allow = 'microphone;camera;';
 iframe.sandbox = 'allow-scripts allow-same-origin allow-forms';
 iframe.setAttribute('allowFullScreen', '');
-iframe.src = chrome.runtime.getURL('ToDoList.html');
-function doBlock(B,isBlock) {
-    console.log(B, isBlock)
+iframe.src = chrome.runtime.getURL('ToDoList.html') + "#tag-" + Mytag;
+function doBlock(B, isBlock) {
+    console.log(B, isBlock,Mytag)
     if (B[Mytag] != undefined && isBlock == false) {
         console.log(B[Mytag].text, B[Mytag].time)
         isBlock = true
+        iframe.src = chrome.runtime.getURL('ToDoList.html') + "#tag-" + Mytag;
         document.body.appendChild(iframe);
     } else if (B[Mytag] == undefined && isBlock) {
         isBlock = false
