@@ -65,12 +65,12 @@
         opacity: 0
     }
 
-    15% {
-        opacity: 0
-    }
-
     30% {
         position: absolute;
+    }
+    
+    38% {
+        opacity: 0
     }
 
     100% {

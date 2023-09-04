@@ -302,18 +302,19 @@ function doBlock() {
 			BlockRecord[i].LLastBT = ThisBrowsingTime[tag]._total_
 			console.log("FF")
 		}
-		console.log(BlockRecord, ThisBrowsingTime[tag]._total_)
-
+		
 		for (let j = 0; j < aB.disabled.length; j++) {
 			const aD = aB.disabled[j];
 			if (isTimeInRange(aD[0], aD[1])) {
 				BlockRecord[i].isD = true
 				Blockings[tag] = {}
 				Blockings[tag].time = aD[0] + "～" + aD[1]
+				console.log(Blockings)
 			} else {
 				BlockRecord[i].isD = false
 			}
 		}
+		console.log(BlockRecord, ThisBrowsingTime[tag]._total_)
 
 		if (BlockRecord[i].isB) {
 			Blockings[tag] = {}
@@ -350,6 +351,7 @@ function doBlock() {
 			}
 		}
 		if (BlockRecord[i].isD) {
+			console.log("ssdwea")
 			Blockings[tag].text = "禁用時間$"
 			for (let i = 0; i < aB.impacted.length; i++) {
 				const item = aB.impacted[i];
