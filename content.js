@@ -189,15 +189,14 @@ iframe.sandbox = 'allow-scripts allow-same-origin allow-forms';
 iframe.setAttribute('allowFullScreen', '');
 iframe.src = chrome.runtime.getURL('ToDoList.html') + "#tag-" + Mytag;
 function doBlock(B, isBlock) {
-    console.log(B, isBlock,Mytag)
-    if (B[Mytag] != undefined && isBlock == false) {
-        console.log(B[Mytag].text, B[Mytag].time)
+    console.log(B, isBlock, Mytag)
+    const T = (B[Mytag].isBd == true || B[Mytag].isB == true || B[Mytag].isL == true || B[Mytag].isD == true)
+    if (T && !isBlock) {
         isBlock = true
         iframe.src = chrome.runtime.getURL('ToDoList.html') + "#tag-" + Mytag;
         document.body.appendChild(iframe);
-    } else if (B[Mytag] == undefined && isBlock) {
+    } else if (!T && isBlock) {
         isBlock = false
         iframe.remove()
     }
 }
-

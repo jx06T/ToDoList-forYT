@@ -246,11 +246,10 @@ chrome.alarms.onAlarm.addListener(alarm => {
 	}
 });
 //-------------------------------------------------------------------------------------------------------------------------
-let BlockRecord = []
 let Blockade = []
+let Blockings = {}
 chrome.storage.local.get("Blockade").then((a) => {
 	Blockade = a.Blockade;
-	BlockRecord = Blockade
 })
 chrome.storage.local.get(["AllBrowsingTime"]).then((result) => {
 	ThisBrowsingTime = result.AllBrowsingTime.BrowsingTime;
@@ -259,115 +258,120 @@ chrome.storage.onChanged.addListener(function (changes, areaName) {
 	if (areaName === 'local') {
 		if (changes.Blockade) {
 			Blockade = changes.Blockade.newValue;
-			BlockRecord = Blockade
 		}
 	}
 });
 function doBlock() {
-	let Blockings = {}
-	// console.log(ThisBrowsingTime)
-	// console.log(ActivePages)
-	// console.log(Blockade)
+	let tempAllTag = []
 	for (let i = 0; i < Blockade.length; i++) {
 		const aB = Blockade[i];
 		const tag = aB.tag
+		tempAllTag.push(tag)
 		if (ThisBrowsingTime[tag] == undefined || aB.restricted == false) {
 			continue
 		}
-		if (BlockRecord[i].LastTime == undefined) {
-			BlockRecord[i].LastTime = ThisBrowsingTime[tag]._total_
-			BlockRecord[i].LLastBT = ThisBrowsingTime[tag]._total_
-			BlockRecord[i].LLastUT = Date.now() / 1000
-			BlockRecord[i].isB = false
-			BlockRecord[i].isL = false
-			BlockRecord[i].isD = false
+		if (Blockings[tag] == undefined) {
+			Blockings[tag] = {}
+			Blockings[tag].LastTime = ThisBrowsingTime[tag]._total_
+			Blockings[tag].LLastBT = ThisBrowsingTime[tag]._total_
+			Blockings[tag].LLastUT = Date.now() / 1000
+			Blockings[tag].isB = false
+			Blockings[tag].isL = false
+			Blockings[tag].isD = false
 		}
 
-		if (aB.rest[0] != "" && !BlockRecord[i].isB && ThisBrowsingTime[tag]._total_ - BlockRecord[i].LastTime > aB.rest[0] * 60) {
-			BlockRecord[i].LastTime = Date.now() / 1000
-			BlockRecord[i].isB = true
+		if (aB.rest[0] != "" && !Blockings[tag].isB && ThisBrowsingTime[tag]._total_ - Blockings[tag].LastTime > aB.rest[0] * 60) {
+			Blockings[tag].LastTime = Date.now() / 1000
+			Blockings[tag].isB = true
+			Blockings[tag].timeB = aB.rest[0].toFixed(2)
+			for (let i = 0; i < aB.impacted.length; i++) {
+				const itemTag = aB.impacted[i];
+				if (itemTag == "") {
+					continue
+				}
+				if (Blockings[itemTag] == undefined) {
+					Blockings[itemTag] = {}
+				}
+				Blockings[itemTag].isBd = true
+				Blockings[itemTag].timeBd = tag
+			}
+			console.log(1, tag)
 		}
-		if (BlockRecord[i].isB && (Date.now() / 1000) - BlockRecord[i].LastTime > aB.rest[1] * 60) {
-			BlockRecord[i].isB = false
-			BlockRecord[i].LastTime = ThisBrowsingTime[tag]._total_
+		if (Blockings[tag].isB && (Date.now() / 1000) - Blockings[tag].LastTime > aB.rest[1] * 60) {
+			Blockings[tag].isB = false
+			for (let i = 0; i < aB.impacted.length; i++) {
+				const itemTag = aB.impacted[i];
+				if (itemTag == "") {
+					continue
+				}
+				if (Blockings[itemTag] == undefined) {
+					Blockings[itemTag] = {}
+				}
+				Blockings[itemTag].isBd = false
+				Blockings[itemTag].timeBd = tag
+			}
+			Blockings[tag].LastTime = ThisBrowsingTime[tag]._total_
+			console.log(2, tag)
 		}
 
-		if (aB.limit[0] != "" && !BlockRecord[i].isL && ThisBrowsingTime[tag]._total_ - BlockRecord[i].LLastBT > aB.limit[0] * 3600) {
-			BlockRecord[i].isL = true
-			console.log("sssss")
+		if (aB.limit[0] != "" && !Blockings[tag].isL && ThisBrowsingTime[tag]._total_ - Blockings[tag].LLastBT > aB.limit[0] * 3600) {
+			Blockings[tag].isL = true
+			Blockings[tag].timeL = aB.limit[0].toFixed(2) + "／" + aB.limit[1].toFixed(2)
+			for (let i = 0; i < aB.impacted.length; i++) {
+				const itemTag = aB.impacted[i];
+				if (itemTag == "") {
+					continue
+				}
+				if (Blockings[itemTag] == undefined) {
+					Blockings[itemTag] = {}
+				}
+				Blockings[itemTag].isBd = true
+				Blockings[itemTag].timeBd = tag
+			}
+			console.log(3, tag)
 		}
-		if (BlockRecord[i].isL && (Date.now() / 1000) - BlockRecord[i].LLastUT > aB.limit[1] * 3600) {
-			BlockRecord[i].isL = false
-			BlockRecord[i].LLastUT = Date.now() / 1000
-			BlockRecord[i].LLastBT = ThisBrowsingTime[tag]._total_
-			console.log("FF")
+		if (Blockings[tag].isL && (Date.now() / 1000) - Blockings[tag].LLastUT > aB.limit[1] * 3600) {
+			Blockings[tag].isL = false
+			for (let i = 0; i < aB.impacted.length; i++) {
+				const itemTag = aB.impacted[i];
+				if (itemTag == "") {
+					continue
+				}
+				if (Blockings[itemTag] == undefined) {
+					Blockings[itemTag] = {}
+				}
+				Blockings[itemTag].isBd = false
+				Blockings[itemTag].timeBd = tag
+			}
+			Blockings[tag].LLastUT = Date.now() / 1000
+			Blockings[tag].LLastBT = ThisBrowsingTime[tag]._total_
+
+			console.log(4, tag)
 		}
-		
+
 		for (let j = 0; j < aB.disabled.length; j++) {
 			const aD = aB.disabled[j];
-			if (isTimeInRange(aD[0], aD[1])) {
-				BlockRecord[i].isD = true
-				Blockings[tag] = {}
-				Blockings[tag].time = aD[0] + "～" + aD[1]
-				console.log(Blockings)
-			} else {
-				BlockRecord[i].isD = false
+			let T = isTimeInRange(aD[0], aD[1])
+			Blockings[tag].isD = T
+			Blockings[tag].timeD = [aD[0], aD[1]]
+			for (let i = 0; i < aB.impacted.length; i++) {
+				const itemTag = aB.impacted[i];
+				if (itemTag == "") {
+					continue
+				}
+				if (Blockings[itemTag] == undefined) {
+					Blockings[itemTag] = {}
+				}
+				Blockings[itemTag].isBd = T
+				Blockings[itemTag].timeBd = tag
 			}
 		}
-		console.log(BlockRecord, ThisBrowsingTime[tag]._total_)
 
-		if (BlockRecord[i].isB) {
-			Blockings[tag] = {}
-			Blockings[tag].text = "休息時間到（$ min）"
-			Blockings[tag].time = aB.rest[1]
-			for (let i = 0; i < aB.impacted.length; i++) {
-				const item = aB.impacted[i];
-				if (item == "") {
-					continue
-				}
-				if (Blockings[item] == undefined) {
-					Blockings[item] = {}
-					Blockings[item].text = "被休息影響了（$ min）"
-					Blockings[item].name = tag
-					Blockings[item].time = aB.rest[1]
-				}
-			}
-		}
-		if (BlockRecord[i].isL) {
-			Blockings[tag] = {}
-			Blockings[tag].text = "達到使用極限（$）"
-			Blockings[tag].time = aB.limit[0] + '／' + aB.limit[1]
-			for (let i = 0; i < aB.impacted.length; i++) {
-				const item = aB.impacted[i];
-				if (item == "") {
-					continue
-				}
-				if (Blockings[item] == undefined) {
-					Blockings[item] = {}
-					Blockings[item].text = "被極限影響了（$）"
-					Blockings[item].name = tag
-					Blockings[item].time = aB.limit[0] + '／' + aB.limit[1]
-				}
-			}
-		}
-		if (BlockRecord[i].isD) {
-			console.log("ssdwea")
-			Blockings[tag].text = "禁用時間$"
-			for (let i = 0; i < aB.impacted.length; i++) {
-				const item = aB.impacted[i];
-				if (item == "") {
-					continue
-				}
-				if (Blockings[item] == undefined) {
-					Blockings[item] = {}
-					Blockings[item].text = "被禁用影響了$"
-					Blockings[item].name = tag
-					Blockings[item].time = Blockings[tag].time
-				}
-			}
-		}
 	}
-	// console.log(BlockRecord)
+	for (var key in Blockings) {
+		// console.log(key + ": " + Blockings[key]);
+	}
+	console.log(Blockings)
 	chrome.storage.local.set({
 		isBlocking: Blockings
 	})

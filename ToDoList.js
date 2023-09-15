@@ -363,13 +363,16 @@ const textD = document.querySelector("#text")
 const RandTasksD = document.querySelector("#RandomTasks")
 const RandTasks = ["吃飯", '跳繩', '鋼琴']
 const urgentB = document.querySelector("#urgent")
+
 urgentB.addEventListener('click', () => {
     BigD.classList.add("urgent")
     setTimeout(() => {
         BigD.classList.remove("urgent")
     }, 3000);
 })
-let text = ''
+
+let text = ""
+let = []
 let time = ""
 let Mytag = null
 document.addEventListener('DOMContentLoaded', () => {
@@ -381,31 +384,52 @@ document.addEventListener('DOMContentLoaded', () => {
     RandTasksD.innerText = RandTasks[Math.floor(Math.random() * RandTasks.length)]
     tagH.innerText = tag
     Mytag = tag
+
     chrome.storage.local.get("isBlocking").then((a) => {
         isBlocking = a.isBlocking;
-        console.log(isBlocking)
-        console.log(Mytag)
         if (!isBlocking[Mytag]) {
             return
         }
-        text = isBlocking[Mytag].text
-        time = isBlocking[Mytag].time
-        if (isBlocking[Mytag].name) {
-            textD.innerText = text.replace("$", time) + "#" + isBlocking[Mytag].name
-        } else {
-            textD.innerText = text.replace("$", time)
-        }
+        GetTEXT(isBlocking, Mytag, 1)
     })
 });
 setInterval(() => {
     let ttime = time
-    if (text == "休息時間到（$ min）" || text == "被休息影響了（$ min）") {
+    if (text == "休息時間到（$ min）") {
         time = time - (5 / 60)
         ttime = Math.abs(parseFloat(time).toFixed(2))
     }
-    if (isBlocking[Mytag].name) {
-        textD.innerText = text.replace("$", ttime) + "#" + isBlocking[Mytag].name
-    } else {
-        textD.innerText = text.replace("$", ttime)
-    }
+    textD.innerText = text.replace("$", ttime)
 }, 5000);
+function GetTEXT(TT, t, c) {
+    console.log(TT, t, c)
+
+    const T = TT[t]
+    if (isBlocking[Mytag].name) {
+        textD.innerText = text.replace("$", time) + "#" + isBlocking[Mytag].name
+    } else {
+        textD.innerText = text.replace("$", time)
+    }
+    if (T.isB) {
+        text = "休息時間到（$ min）"
+        time = T.timeB
+    }
+    if (T.isL) {
+        text = "達到使用極限（$）"
+        time = T.timeL
+    }
+    if (T.isD) {
+        text = "禁用時間$"
+        time = T.timeD[0] + "～" + T.timeD[1]
+    }
+    if (c == 0) {
+        return
+    }
+    if (T.isBd) {
+        GetTEXT(TT, T.timeBd, 0)
+        text = "受" + T.timeBd + "影響：" + text
+    }
+    console.log(text, time)
+    textD.innerText = text.replace("$", time)
+}
+
