@@ -200,3 +200,14 @@ function doBlock(B, isBlock) {
         iframe.remove()
     }
 }
+
+window.addEventListener('message', function (event) {
+    // event.data 包含從 iframe 發送的訊息
+    const receivedMessage = event.data;
+    if (receivedMessage == "urgent") {
+        iframe.classList.add('urgent')
+        setTimeout(() => {
+            iframe.classList.remove('urgent')
+        }, 3000);
+    }
+});

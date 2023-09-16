@@ -16,6 +16,7 @@
          "128": "images/ToDoYT128.png"
       }
    },
+   
    "web_accessible_resources": [
       {
          "resources": [
@@ -31,7 +32,8 @@
       "scripting",
       "activeTab",
       "storage",
-      "alarms"
+      "alarms",
+      "notifications"
    ],
    "host_permissions": [
       "https://app.simplenote.com/publish/*",

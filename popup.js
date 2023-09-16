@@ -1,4 +1,8 @@
 const ToToday = document.querySelector('#today')
+const Todo = document.querySelector('#Todo')
+Todo.addEventListener("click", () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL('ToDoList.html') });
+})
 ToToday.addEventListener("click", UpDataImg)
 let TodayBrowsingTimenew
 let aWeekBrowsingTimenew

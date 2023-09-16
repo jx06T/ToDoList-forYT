@@ -18,3 +18,8 @@
     z-index: 2147483647 !important;
     display: block !important;
 }
+
+#jx06iframe.urgent {
+    opacity: 35%;
+    pointer-events: none;
+}

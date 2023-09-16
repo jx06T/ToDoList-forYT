@@ -357,7 +357,7 @@ function UpDataId(t = null) {
     }
 }
 InitData()
-const BigD = document.querySelector("#BigDiv")
+// const BigD = document.querySelector("#BigDiv")
 const tagH = document.querySelector("#tag")
 const textD = document.querySelector("#text")
 const RandTasksD = document.querySelector("#RandomTasks")
@@ -365,23 +365,21 @@ const RandTasks = ["吃飯", '跳繩', '鋼琴']
 const urgentB = document.querySelector("#urgent")
 
 urgentB.addEventListener('click', () => {
-    BigD.classList.add("urgent")
-    setTimeout(() => {
-        BigD.classList.remove("urgent")
-    }, 3000);
+    window.parent.postMessage("urgent", '*');
+
 })
 
 let text = ""
 let = []
 let time = ""
 let Mytag = null
-document.addEventListener('DOMContentLoaded', () => {
+function init() {
+    RandTasksD.innerText = RandTasks[Math.floor(Math.random() * RandTasks.length)]
     const hash = location.hash
     if (hash == "") {
         return
     }
     const tag = hash.split("#")[1].slice(4)
-    RandTasksD.innerText = RandTasks[Math.floor(Math.random() * RandTasks.length)]
     tagH.innerText = tag
     Mytag = tag
 
@@ -392,7 +390,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         GetTEXT(isBlocking, Mytag, 1)
     })
+}
+document.addEventListener('DOMContentLoaded', () => {
+    init()
 });
+document.addEventListener("load",()=>{
+    init()
+})
 setInterval(() => {
     let ttime = time
     if (text == "休息時間到（$ min）") {
@@ -428,6 +432,9 @@ function GetTEXT(TT, t, c) {
     if (T.isBd) {
         GetTEXT(TT, T.timeBd, 0)
         text = "受" + T.timeBd + "影響：" + text
+    }
+    if (text == "休息時間到（$ min）") {
+        time = Math.abs(parseFloat(time).toFixed(2))
     }
     console.log(text, time)
     textD.innerText = text.replace("$", time)

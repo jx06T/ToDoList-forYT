@@ -30,11 +30,21 @@
 hr {
     margin: 20px;
 }
-#today{
+
+#today {
     position: fixed;
     margin-top: -300px;
     margin-left: 405px;
     font-size: 16px;
-    text-decoration:underline;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#Todo {
+    position: fixed;
+    margin-top: -300px;
+    margin-left: 20px;
+    font-size: 16px;
+    text-decoration: underline;
     cursor: pointer;
 }

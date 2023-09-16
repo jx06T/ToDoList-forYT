@@ -64,11 +64,23 @@ function GetMyDay(today) {
 chrome.runtime.onStartup.addListener(() => {
 	UpData()
 	chrome.alarms.create('midnight', { when: getMidnight() });
-	chrome.tabs.create({ url: chrome.runtime.getURL('options\\options.html') });
+	// chrome.tabs.create({ url: chrome.runtime.getURL('options\\options.html') });
 });
 chrome.runtime.onInstalled.addListener(() => {
+	var notificationOptions = {
+		type: "basic",
+		title: "這是標題",
+		message: "這是訊息內容",
+		// iconUrl: "https://pbs.twimg.com/media/FcBzu0yagAABRvD.jpg" // 請替換為您自己的圖示 URL
+		iconUrl: "images\\ToDoYT128.png" // 請替換為您自己的圖示 URL
+	};
+	
+	// 創建通知
+	chrome.notifications.create("my-notification", notificationOptions, function (notificationId) {
+		console.log("通知已創建，ID：" + notificationId);
+	});
 	UpData()
-	chrome.tabs.create({ url: chrome.runtime.getURL('options\\options.html') });
+	// chrome.tabs.create({ url: chrome.runtime.getURL('options\\options.html') });
 })
 
 function getMidnight() {
@@ -283,7 +295,7 @@ function doBlock() {
 		if (aB.rest[0] != "" && !Blockings[tag].isB && ThisBrowsingTime[tag]._total_ - Blockings[tag].LastTime > aB.rest[0] * 60) {
 			Blockings[tag].LastTime = Date.now() / 1000
 			Blockings[tag].isB = true
-			Blockings[tag].timeB = aB.rest[0].toFixed(2)
+			Blockings[tag].timeB = aB.rest[1].toFixed(2)
 			for (let i = 0; i < aB.impacted.length; i++) {
 				const itemTag = aB.impacted[i];
 				if (itemTag == "") {
@@ -369,6 +381,17 @@ function doBlock() {
 
 	}
 	for (var key in Blockings) {
+		if (Blockings[key].isB) {
+			Blockings[key].timeB -= 3 / 60
+			if (tempAllTag.indexOf(key) == -1) {
+				Blockings[key].timeB.deleteCount += 1
+			} else {
+				Blockings[key].timeB.deleteCount = 0
+			}
+			if (Blockings[key].timeB.deleteCount > 19) {
+				Blockings[key] = undefined
+			}
+		}
 		// console.log(key + ": " + Blockings[key]);
 	}
 	console.log(Blockings)
@@ -400,6 +423,7 @@ function isTimeInRange(startTime, endTime) {
 }
 
 //-------------------------------------------------------------------------------------------------------------------------
+
 
 function DeBugResetData() {
 	chrome.storage.local.set({

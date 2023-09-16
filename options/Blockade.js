@@ -19,7 +19,7 @@ class BlockadeMM {
         this.copyB = this.BlockingSettings.querySelector("#copy")
 
         this.TEMPLATE = {
-            tag: '', limit: ["", ""], rest: ["", ""], impacted: ["", "",""], restricted: true, disabled: []
+            tag: '', limit: ["", ""], rest: ["", ""], impacted: ["", "", ""], restricted: true, disabled: []
         }
         setTimeout(() => {
             this.init()
@@ -196,15 +196,31 @@ class BlockadeMM {
                     target.style.color = this.TagToColor[target.value] ? this.TagToColor[target.value] : "#000"
                     break
                 case "rest1":
+                    if (target.value == "") {
+                        aTag.rest[0] = ""
+                        break
+                    }
                     aTag.rest[0] = parseFloat(target.value)
                     break;
                 case "rest2":
+                    if (target.value == "") {
+                        aTag.rest[1] = ""
+                        break
+                    }
                     aTag.rest[1] = parseFloat(target.value)
                     break;
                 case "limit1":
+                    if (target.value == "") {
+                        aTag.limit[0] = ""
+                        break
+                    }
                     aTag.limit[0] = parseFloat(target.value)
                     break;
                 case "limit2":
+                    if (target.value == "") {
+                        aTag.limit[1] = ""
+                        break
+                    }
                     aTag.limit[1] = parseFloat(target.value)
                     break;
                 case "":
