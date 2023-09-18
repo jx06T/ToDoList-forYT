@@ -1,6 +1,8 @@
 const notes1 = document.querySelector('#notes1');
 const notes2 = document.querySelector('#notes2');
+const sortB = document.querySelector('#sort');
 const TodoList = document.querySelector(".todo-list")
+sortB.dataset.s = 1
 const states = { "✖": ["★", "S3", "S1"], "★": ["✔", "S1", "S2"], "✔": ["！", "S2", "S4"], "！": ["✖", "S4", "S3"] }
 const timeIntervals = [
     3, 5, 10, 30, 60, 90, 120, 180, 300, 420, 540, 720, 1440, 2160, 2880,
@@ -53,13 +55,30 @@ function InitData() {
     })
     chrome.storage.local.get(["AllNote"]).then((result) => {
         AllNote = result.AllNote
-        // console.log(AllNote)
         setTimeout(() => {
-            InitTable()
+            InitTable(AllTodo[0]._sort_)
         }, 10);
     })
 }
-function InitTable() {
+chrome.storage.onChanged.addListener(function (changes, areaName) {
+    if (areaName === 'local') {
+        if (changes.AllNote) {
+            AllNote = changes.AllNote.newValue
+            // InitTable(AllTodo[0]._sort_)
+        }
+        if (changes.AllTodo) {
+            AllTodo = changes.AllTodo.newValue
+            // InitTable(AllTodo[0]._sort_)
+        }
+
+    }
+});
+window.addEventListener('focus', () => {
+    InitTable(AllTodo[0]._sort_)
+});
+
+
+function InitTable(_sort_) {
     const half = Math.round(AllNote.length / 2)
     const n1c = notes1.querySelectorAll("tr")
     const n2c = notes2.querySelectorAll("tr")
@@ -93,8 +112,19 @@ function InitTable() {
         tc[i].remove()
     }
     for (let i = 0; i < AllTodo.length; i++) {
-        const aTodo = AllTodo[i];
-        const NewTodo = GetNewTodo(aTodo.text, aTodo.time, aTodo.state, i)
+        AllTodo[i].iddd = i;
+    }
+    let AllTodoo = Array.from(AllTodo)
+    if (_sort_ != 0) {
+        AllTodoo = AllTodoo.sort((a, b) => {
+            const r = a.time < b.time
+            return ((r * 2) - 1) * _sort_
+        })
+
+    }
+    for (let i = 0; i < AllTodoo.length; i++) {
+        const aTodo = AllTodoo[i];
+        const NewTodo = GetNewTodo(aTodo.text, aTodo.time, aTodo.state, aTodo.iddd)
         TodoList.appendChild(NewTodo)
     }
 
@@ -107,7 +137,7 @@ function NoteI(event) {
     target.style.height = target.scrollHeight + 'px';
     if (parent.classList.contains('NewNote')) {
         parent.classList.remove('NewNote')
-        console.log(parent.parentNode.id == "notes1" ? UpDataId()[0] : UpDataId()[1])
+        // console.log(parent.parentNode.id == "notes1" ? UpDataId()[0] : UpDataId()[1])
         AllNote.splice(parent.parentNode.id == "notes1" ? UpDataId()[0] : UpDataId()[1], 0, {
             text: target.value, time: "－－－－－－－－－"
         })
@@ -149,13 +179,21 @@ notes1.addEventListener('click', NoteCl);
 notes2.addEventListener('input', NoteI);
 notes2.addEventListener('change', NoteCh);
 notes2.addEventListener('click', NoteCl);
+sortB.addEventListener('click', () => {
+    let t = Number(sortB.dataset.s)
+    sortB.dataset.s = t + 1
+    AllTodo[0]._sort_ = (t + 1) % 3 - 1
+    chrome.storage.local.set({ AllTodo: AllTodo })
+    // console.log(t)
+    InitTable(AllTodo[0]._sort_)
+});
 TodoList.addEventListener("click", (event) => {
     const target = event.target;
     const parent = target.parentNode
     // console.log(parent)
     if (target.classList.contains('todo-state')) {
         const index = Number(parent.dataset.index)
-        console.log(target, parent)
+        // console.log(target, parent)
         if (target.classList.contains("DD")) {
             AllTodo.splice(index, 1)
             parent.remove()
@@ -200,7 +238,7 @@ TodoList.addEventListener("click", (event) => {
         parent.querySelector(".todo-state").classList.add("DD")
         let listen1 = (event) => {
             const target = event.target;
-            console.log(target)
+            // console.log(target)
             let s = TodoList.querySelector(".sliding")
             if (target != s && s != null && !target.classList.contains("todo-time")) {
                 s.querySelector("#TimeSlider").remove()
@@ -240,7 +278,7 @@ TodoList.addEventListener("change", (event) => {
 function TodoUpData(event) {
     const target = event.target;
     const parent = target.parentNode
-    console.log(target)
+    // console.log(target)
     const index = Number(parent.dataset.index)
     if (target.classList.contains("todo-text")) {
         AllTodo[index].text = target.value
@@ -250,7 +288,7 @@ function TodoUpData(event) {
     UpData()
 }
 function UpData() {
-    console.log(AllNote, AllTodo)
+    // console.log(AllNote, AllTodo)
     chrome.storage.local.set({ AllNote: AllNote })
     chrome.storage.local.set({ AllTodo: AllTodo })
 }
@@ -349,10 +387,8 @@ function UpDataId(t = null) {
     }
     if (t == 1) {
         const tc = TodoList.querySelectorAll("li")
-        console.log('ssds')
         for (let i = 0; i < tc.length; i++) {
             tc[i].dataset.index = i
-            console.log('ss')
         }
     }
 }
@@ -394,7 +430,7 @@ function init() {
 document.addEventListener('DOMContentLoaded', () => {
     init()
 });
-document.addEventListener("load",()=>{
+document.addEventListener("load", () => {
     init()
 })
 setInterval(() => {
@@ -406,7 +442,7 @@ setInterval(() => {
     textD.innerText = text.replace("$", ttime)
 }, 5000);
 function GetTEXT(TT, t, c) {
-    console.log(TT, t, c)
+    // console.log(TT, t, c)
 
     const T = TT[t]
     if (isBlocking[Mytag].name) {

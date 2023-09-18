@@ -10,7 +10,7 @@ function InitData() {
 		Blockade: [{ tag: 'YT', advance: 3, limit: [3, 6], rest: [20, 5], impacted: ["claude", "", ""], restricted: true, disabled: [["23:00", "08:00"], ["11:00", "13:00"]] }, { tag: 'ChatGPT', advance: 3, limit: [5, 12], rest: [5, 0], restricted: false, impacted: ["", "", ""], disabled: [["23:00", "08:00"], ["23:00", "08:00"]] }]
 	})
 	chrome.storage.local.set({
-		AllTodo: [{ text: "背單字", time: "10 min", state: "★" }, { text: "寫作業", time: "1 hr", state: "！" }]
+		AllTodo: [{ _sort_: 0, state: "！", text: "背單字", time: 30240 }, { state: "✔", text: "補習地科", time: 2880 }, { state: "✖", text: "補習數學", time: 4320 }]
 	})
 	chrome.storage.local.set({
 		isBlocking: {}
@@ -74,7 +74,7 @@ chrome.runtime.onInstalled.addListener(() => {
 		// iconUrl: "https://pbs.twimg.com/media/FcBzu0yagAABRvD.jpg" // 請替換為您自己的圖示 URL
 		iconUrl: "images\\ToDoYT128.png" // 請替換為您自己的圖示 URL
 	};
-	
+
 	// 創建通知
 	chrome.notifications.create("my-notification", notificationOptions, function (notificationId) {
 		console.log("通知已創建，ID：" + notificationId);
