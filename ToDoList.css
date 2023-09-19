@@ -202,6 +202,21 @@ h2 {
   /* display: flex; */
 }
 
+.todo-item.sort {
+  animation: fadeIn 0.3s ease-out forwards;
+
+}
+
+@keyframes fadeIn {
+  from {
+    margin-top: 100px;
+  }
+
+  to {
+    margin-top: 0px;
+  }
+}
+
 .todo-text {
   flex-grow: 1;
   font-size: 20px;
@@ -374,4 +389,24 @@ h2 {
 
 h2.h22 {
   border-color: #c3c3c3;
+}
+
+/* ----------------------------------------------- */
+.sortB {
+  user-select: none;
+  line-height: 16px;
+  font-size: 16px;
+  line-height: 19px;
+  height: 19px;
+  width: 19px;
+  display: inline-block;
+  border-radius: 5px;
+  background: #d8f1f7;
+  color: #000000;
+  cursor: pointer;
+}
+
+.sortB.second {
+  background: #e6e6e6;
+  color: #919597;
 }

@@ -1,9 +1,12 @@
 const notes1 = document.querySelector('#notes1');
 const notes2 = document.querySelector('#notes2');
-const sortB = document.querySelector('#sort');
+const sortSB = document.querySelector('#sortS');
+const sortTB = document.querySelector('#sortT');
 const TodoList = document.querySelector(".todo-list")
-sortB.dataset.s = 1
+
 const states = { "✖": ["★", "S3", "S1"], "★": ["✔", "S1", "S2"], "✔": ["！", "S2", "S4"], "！": ["✖", "S4", "S3"] }
+const SortState = { "1": "↓", "2": "–", "3": "↑" }
+const StateSort = ["！", "★", "✖", "✔"]
 const timeIntervals = [
     3, 5, 10, 30, 60, 90, 120, 180, 300, 420, 540, 720, 1440, 2160, 2880,
     3600, 4320, 5184, 6048, 10080, 20160, 30240
@@ -49,9 +52,14 @@ function GetTextTime(interval) {
 // console.log(timeIntervalStrings);
 let AllNote = []
 let AllTodo = []
+let isNeedUpData = false
 function InitData() {
     chrome.storage.local.get(["AllTodo"]).then((result) => {
         AllTodo = result.AllTodo
+        const s = AllTodo[0]._sort_
+        console.log(s)
+        sortTB.dataset.s = s > 0 ? s + 2 : 2
+        sortSB.dataset.s = s < 0 ? s + 6 : 2
     })
     chrome.storage.local.get(["AllNote"]).then((result) => {
         AllNote = result.AllNote
@@ -64,21 +72,34 @@ chrome.storage.onChanged.addListener(function (changes, areaName) {
     if (areaName === 'local') {
         if (changes.AllNote) {
             AllNote = changes.AllNote.newValue
-            // InitTable(AllTodo[0]._sort_)
+            isNeedUpData = true
         }
         if (changes.AllTodo) {
+            isNeedUpData = true
             AllTodo = changes.AllTodo.newValue
-            // InitTable(AllTodo[0]._sort_)
         }
 
     }
 });
 window.addEventListener('focus', () => {
-    InitTable(AllTodo[0]._sort_)
+    if (isNeedUpData) {
+        InitTable(AllTodo[0]._sort_)
+        isNeedUpData = false
+    }
 });
 
 
-function InitTable(_sort_) {
+function InitTable(_sort_, t) {
+    if (_sort_ > 0) {
+        sortTB.innerText = SortState[_sort_]
+        sortTB.classList.remove("second")
+        sortSB.classList.add("second")
+    } else {
+        sortSB.innerText = SortState[_sort_ + 4]
+        sortSB.classList.remove("second")
+        sortTB.classList.add("second")
+    }
+    console.log("!", _sort_)
     const half = Math.round(AllNote.length / 2)
     const n1c = notes1.querySelectorAll("tr")
     const n2c = notes2.querySelectorAll("tr")
@@ -115,16 +136,34 @@ function InitTable(_sort_) {
         AllTodo[i].iddd = i;
     }
     let AllTodoo = Array.from(AllTodo)
-    if (_sort_ != 0) {
+    if (Math.abs(_sort_) != 2) {
         AllTodoo = AllTodoo.sort((a, b) => {
-            const r = a.time < b.time
-            return ((r * 2) - 1) * _sort_
+            if (_sort_ > 0) {
+                if (a.time == b.time) {
+                    var r = StateSort.indexOf(a.state) < StateSort.indexOf(b.state)
+                    r = Math.abs(_sort_) == 1 ? r : !r
+                } else {
+                    var r = a.time > b.time
+                }
+            } else {
+                if (StateSort.indexOf(a.state) == StateSort.indexOf(b.state)) {
+                    var r = a.time < b.time
+                    r = Math.abs(_sort_) == 1 ? r : !r
+                } else {
+                    var r = StateSort.indexOf(a.state) < StateSort.indexOf(b.state)
+                }
+
+            }
+            return ((r * 2) - 1) * (Math.abs(_sort_) - 2)
         })
 
     }
     for (let i = 0; i < AllTodoo.length; i++) {
         const aTodo = AllTodoo[i];
         const NewTodo = GetNewTodo(aTodo.text, aTodo.time, aTodo.state, aTodo.iddd)
+        if (t) {
+            NewTodo.classList.add("sort")
+        }
         TodoList.appendChild(NewTodo)
     }
 
@@ -179,13 +218,21 @@ notes1.addEventListener('click', NoteCl);
 notes2.addEventListener('input', NoteI);
 notes2.addEventListener('change', NoteCh);
 notes2.addEventListener('click', NoteCl);
-sortB.addEventListener('click', () => {
-    let t = Number(sortB.dataset.s)
-    sortB.dataset.s = t + 1
-    AllTodo[0]._sort_ = (t + 1) % 3 - 1
+sortTB.addEventListener('click', () => {
+    let t = Number(sortTB.dataset.s)
+    sortTB.dataset.s = t + 1
+    AllTodo[0]._sort_ = (t + 1) % 3 + 1
     chrome.storage.local.set({ AllTodo: AllTodo })
     // console.log(t)
-    InitTable(AllTodo[0]._sort_)
+    InitTable(AllTodo[0]._sort_, true)
+});
+sortSB.addEventListener('click', () => {
+    let t = Number(sortSB.dataset.s)
+    sortSB.dataset.s = t + 1
+    AllTodo[0]._sort_ = (t + 1) % 3 - 3
+    chrome.storage.local.set({ AllTodo: AllTodo })
+    // console.log(t)
+    InitTable(AllTodo[0]._sort_, true)
 });
 TodoList.addEventListener("click", (event) => {
     const target = event.target;
