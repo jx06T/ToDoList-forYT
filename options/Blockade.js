@@ -35,6 +35,17 @@ class BlockadeMM {
             });
             this.InitTable()
         })
+        chrome.storage.onChanged.addListener((changes, areaName) => {
+            if (areaName === 'local') {
+                if (changes.AllRule) {
+                    this.TagToColor = {}
+                    ALL_TAG.forEach((item) => {
+                        this.TagToColor[item.tag] = item.color
+                    });
+                    this.InitTable()
+                }
+            }
+        });
     }
     InitTable = () => {
         const rows = this.RuleTable.querySelectorAll('tr');
@@ -128,6 +139,7 @@ class BlockadeMM {
                 return
             }
             newTag.style.color = this.TagToColor[newTagV] ? this.TagToColor[newTagV] : "#000"
+
             this.Blockade[Number(parent.dataset.index) - 1].tag = newTagV
             this.UpData(this.Blockade)
         })
