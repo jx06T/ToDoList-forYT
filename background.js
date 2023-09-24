@@ -263,6 +263,9 @@ let Blockings = {}
 chrome.storage.local.get("Blockade").then((a) => {
 	Blockade = a.Blockade;
 })
+chrome.storage.local.get("isBlocking").then((a) => {
+	Blockings = a.isBlocking;
+})
 chrome.storage.local.get(["AllBrowsingTime"]).then((result) => {
 	ThisBrowsingTime = result.AllBrowsingTime.BrowsingTime;
 })
