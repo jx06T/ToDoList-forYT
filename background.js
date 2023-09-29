@@ -31,6 +31,15 @@ async function UpData() {
 	}
 	if (LastUpDataTime[0] != GetMyDay(today)) {
 
+		for (let i = 0; i < Blockade.length; i++) {
+			const aB = Blockade[i];
+			const tag = aB.tag
+			if (Blockings[tag] == undefined) {
+				return
+			}
+			Blockings[tag].LastTime = Blockings[tag].LastTime - ThisBrowsingTime[tag]._total_
+		}
+
 		const r2 = await chrome.storage.local.get("AllBrowsingTime");
 		const LBrowsingTime = r2.AllBrowsingTime;
 
@@ -47,11 +56,15 @@ async function UpData() {
 		aWeek[aWeek.length - 1][today.getDay()] = { Date: GetMyDay(today), BrowsingTime: null }
 
 		chrome.storage.local.set({ aWeek: aWeek })
-		chrome.storage.local.set({ AllBrowsingTime: { Date: [GetMyDay(today), today.getDay()], BrowsingTime: {} } })
+		const tempThisBrowsingTime = { Date: [GetMyDay(today), today.getDay()], BrowsingTime: {} }
+		chrome.storage.local.set({ AllBrowsingTime: tempThisBrowsingTime })
+		ThisBrowsingTime = tempThisBrowsingTime
 		chrome.storage.local.set({ LastUpDataTime: [GetMyDay(today), today.getDay()] })
-	}
-}
 
+		chrome.storage.local.set({ isBlocking: Blockings })
+	}
+	console.log(ThisBrowsingTime, Blockings)
+}
 // DeBugResetData()
 // UpData()
 
@@ -265,6 +278,7 @@ chrome.storage.local.get("Blockade").then((a) => {
 })
 chrome.storage.local.get("isBlocking").then((a) => {
 	Blockings = a.isBlocking;
+	console.log(Blockings)
 })
 chrome.storage.local.get(["AllBrowsingTime"]).then((result) => {
 	ThisBrowsingTime = result.AllBrowsingTime.BrowsingTime;
@@ -295,6 +309,7 @@ function doBlock() {
 			Blockings[tag].isD = false
 		}
 
+		// console.log(aB, aB.rest[0], Blockings[tag].isB, ThisBrowsingTime[tag]._total_, Blockings[tag].LastTime)
 		if (aB.rest[0] != "" && !Blockings[tag].isB && ThisBrowsingTime[tag]._total_ - Blockings[tag].LastTime > aB.rest[0] * 60) {
 			Blockings[tag].LastTime = Date.now() / 1000
 			Blockings[tag].isB = true
