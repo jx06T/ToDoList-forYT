@@ -35,7 +35,7 @@ async function UpData() {
 			const aB = Blockade[i];
 			const tag = aB.tag
 			if (Blockings[tag] == undefined) {
-				return
+				continue
 			}
 			Blockings[tag].LastTime = Blockings[tag].LastTime - ThisBrowsingTime[tag]._total_
 		}
