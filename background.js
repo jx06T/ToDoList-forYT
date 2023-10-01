@@ -37,7 +37,9 @@ async function UpData() {
 			if (Blockings[tag] == undefined) {
 				continue
 			}
-			Blockings[tag].LastTime = Blockings[tag].LastTime - ThisBrowsingTime[tag]._total_
+			if (Blockings[tag].isB == true) {
+				Blockings[tag].LastTime = Blockings[tag].LastTime - ThisBrowsingTime[tag]._total_
+			}
 		}
 
 		const r2 = await chrome.storage.local.get("AllBrowsingTime");
@@ -47,7 +49,7 @@ async function UpData() {
 		let aWeek = r3.aWeek;
 
 		aWeek[aWeek.length - 1][LBrowsingTime.Date[1]] = { Date: LBrowsingTime.Date[0], BrowsingTime: LBrowsingTime.BrowsingTime }
-		if (parseInt(GetMyDay(today).slice(3, 5)) - parseInt(LastUpDataTime[0].slice(3, 5)) > (6 - LastUpDataTime[1])) {
+		if (calculateDateDifference(GetMyDay(today), LastUpDataTime[0]) > (6 - LastUpDataTime[1])) {
 			if (aWeek.length > 3) {
 				aWeek.shift()
 			}
@@ -67,6 +69,18 @@ async function UpData() {
 }
 // DeBugResetData()
 // UpData()
+
+function calculateDateDifference(dateStr1, dateStr2) {
+	const [month1, day1] = dateStr1.split('/').map(Number);
+	const [month2, day2] = dateStr2.split('/').map(Number);
+	const currentYear = new Date().getFullYear();
+	const date1 = new Date(currentYear, month1 - 1, day1);
+	const date2 = new Date(currentYear, month2 - 1, day2);
+	const timeDifference = date2 - date1;
+	const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+	return daysDifference;
+}
+
 
 function GetMyDay(today) {
 	let month = today.getMonth() + 1; // 月份從 0 開始計算
@@ -309,7 +323,7 @@ function doBlock() {
 			Blockings[tag].isD = false
 		}
 
-		// console.log(aB, aB.rest[0], Blockings[tag].isB, ThisBrowsingTime[tag]._total_, Blockings[tag].LastTime)
+		console.log(aB, aB.rest[0], Blockings[tag].isB, ThisBrowsingTime[tag]._total_, Blockings[tag].LastTime)
 		if (aB.rest[0] != "" && !Blockings[tag].isB && ThisBrowsingTime[tag]._total_ - Blockings[tag].LastTime > aB.rest[0] * 60) {
 			Blockings[tag].LastTime = Date.now() / 1000
 			Blockings[tag].isB = true
