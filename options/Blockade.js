@@ -19,12 +19,15 @@ class BlockadeMM {
         this.copyB = this.BlockingSettings.querySelector("#copy")
 
         this.TEMPLATE = {
-            tag: '', limit: ["", ""], rest: ["", ""], impacted: ["", "", ""], restricted: true, disabled: []
+            tag: '', limit: ["", ""], rest: ["", ""], impacted: ["", "", ""], restricted: true, disabled: [], advance: ""
         }
         setTimeout(() => {
             this.init()
             this.listen()
         }, 10);
+    }
+    randId = () => {
+        return Math.random().toString(36).substring(2.9) + Math.random().toString(36).substring(2.9)
     }
     init = () => {
         chrome.storage.local.get(["Blockade"]).then((result) => {
@@ -134,6 +137,7 @@ class BlockadeMM {
 
                 let NewData = JSON.parse(JSON.stringify(this.TEMPLATE))
                 NewData.tag = newTagV
+                NewData.ID = this.randId()
                 this.Blockade.push(NewData)
                 this.UpData(this.Blockade)
                 return
@@ -154,7 +158,10 @@ class BlockadeMM {
             }
             const parent = target.parentNode.parentNode
             if (parent.classList.contains('new-row')) {
-                this.Blockade.push(JSON.parse(JSON.stringify(this.TEMPLATE)))
+                let TempNew = JSON.parse(JSON.stringify(this.TEMPLATE))
+                TempNew.ID = this.randId()
+                this.Blockade.push(TempNew)
+                this.UpData(this.Blockade)
                 parent.classList.remove('new-row')
 
                 let HTML = this.GetNewRow(this.TEMPLATE)

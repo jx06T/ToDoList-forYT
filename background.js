@@ -65,7 +65,7 @@ async function UpData() {
 
 		chrome.storage.local.set({ isBlocking: Blockings })
 	}
-	console.log(ThisBrowsingTime, Blockings)
+	// console.log(ThisBrowsingTime, Blockings)
 }
 // DeBugResetData()
 // UpData()
@@ -94,18 +94,18 @@ chrome.runtime.onStartup.addListener(() => {
 	// chrome.tabs.create({ url: chrome.runtime.getURL('options\\options.html') });
 });
 chrome.runtime.onInstalled.addListener(() => {
-	var notificationOptions = {
-		type: "basic",
-		title: "這是標題",
-		message: "這是訊息內容",
-		// iconUrl: "https://pbs.twimg.com/media/FcBzu0yagAABRvD.jpg" // 請替換為您自己的圖示 URL
-		iconUrl: "images\\ToDoYT128.png" // 請替換為您自己的圖示 URL
-	};
+	// var notificationOptions = {
+	// 	type: "basic",
+	// 	title: "這是標題",
+	// 	message: "這是訊息內容",
+	// 	// iconUrl: "https://pbs.twimg.com/media/FcBzu0yagAABRvD.jpg" // 請替換為您自己的圖示 URL
+	// 	iconUrl: "images\\ToDoYT128.png" // 請替換為您自己的圖示 URL
+	// };
 
-	// 創建通知
-	chrome.notifications.create("my-notification", notificationOptions, function (notificationId) {
-		console.log("通知已創建，ID：" + notificationId);
-	});
+	// // 創建通知
+	// chrome.notifications.create("my-notification", notificationOptions, function (notificationId) {
+	// 	console.log("通知已創建，ID：" + notificationId);
+	// });
 	UpData()
 	// chrome.tabs.create({ url: chrome.runtime.getURL('options\\options.html') });
 })
@@ -292,7 +292,7 @@ chrome.storage.local.get("Blockade").then((a) => {
 })
 chrome.storage.local.get("isBlocking").then((a) => {
 	Blockings = a.isBlocking;
-	console.log(Blockings)
+	// console.log(Blockings)
 })
 chrome.storage.local.get(["AllBrowsingTime"]).then((result) => {
 	ThisBrowsingTime = result.AllBrowsingTime.BrowsingTime;
@@ -304,15 +304,17 @@ chrome.storage.onChanged.addListener(function (changes, areaName) {
 		}
 	}
 });
+
 function doBlock() {
 	let tempAllTag = []
 	for (let i = 0; i < Blockade.length; i++) {
 		const aB = Blockade[i];
 		const tag = aB.tag
 		tempAllTag.push(tag)
-		if (ThisBrowsingTime[tag] == undefined || aB.restricted == false) {
+		if (tag == "" || ThisBrowsingTime[tag] == undefined || aB.restricted == false) {
 			continue
 		}
+		// console.log(aB)
 		if (Blockings[tag] == undefined) {
 			Blockings[tag] = {}
 			Blockings[tag].LastTime = ThisBrowsingTime[tag]._total_
@@ -323,10 +325,10 @@ function doBlock() {
 			Blockings[tag].isD = false
 		}
 
-		console.log(aB, aB.rest[0], Blockings[tag].isB, ThisBrowsingTime[tag]._total_, Blockings[tag].LastTime)
 		if (aB.rest[0] != "" && !Blockings[tag].isB && ThisBrowsingTime[tag]._total_ - Blockings[tag].LastTime > aB.rest[0] * 60) {
 			Blockings[tag].LastTime = Date.now() / 1000
 			Blockings[tag].isB = true
+			Blockings[tag].id = aB.ID
 			Blockings[tag].timeB = aB.rest[1].toFixed(2)
 			for (let i = 0; i < aB.impacted.length; i++) {
 				const itemTag = aB.impacted[i];
@@ -341,7 +343,7 @@ function doBlock() {
 			}
 			console.log(1, tag)
 		}
-		if (Blockings[tag].isB && (Date.now() / 1000) - Blockings[tag].LastTime > aB.rest[1] * 60) {
+		if (Blockings[tag].ID == aB.ID && Blockings[tag].isB && (Date.now() / 1000) - Blockings[tag].LastTime > aB.rest[1] * 60) {
 			Blockings[tag].isB = false
 			for (let i = 0; i < aB.impacted.length; i++) {
 				const itemTag = aB.impacted[i];
@@ -360,6 +362,7 @@ function doBlock() {
 
 		if (aB.limit[0] != "" && !Blockings[tag].isL && ThisBrowsingTime[tag]._total_ - Blockings[tag].LLastBT > aB.limit[0] * 3600) {
 			Blockings[tag].isL = true
+			Blockings[tag].id = aB.ID
 			Blockings[tag].timeL = aB.limit[0].toFixed(2) + "／" + aB.limit[1].toFixed(2)
 			for (let i = 0; i < aB.impacted.length; i++) {
 				const itemTag = aB.impacted[i];
@@ -374,7 +377,7 @@ function doBlock() {
 			}
 			console.log(3, tag)
 		}
-		if (Blockings[tag].isL && (Date.now() / 1000) - Blockings[tag].LLastUT > aB.limit[1] * 3600) {
+		if (Blockings[tag].ID == aB.ID && Blockings[tag].isL && (Date.now() / 1000) - Blockings[tag].LLastUT > aB.limit[1] * 3600) {
 			Blockings[tag].isL = false
 			for (let i = 0; i < aB.impacted.length; i++) {
 				const itemTag = aB.impacted[i];
@@ -396,7 +399,15 @@ function doBlock() {
 		for (let j = 0; j < aB.disabled.length; j++) {
 			const aD = aB.disabled[j];
 			let T = isTimeInRange(aD[0], aD[1])
-			Blockings[tag].isD = T
+			if (T) {
+				Blockings[tag].isD = T
+				Blockings[tag].id = aB.ID
+			} else if (Blockings[tag].ID == aB.ID) {
+				Blockings[tag].isD = T
+			} else {
+				break
+			}
+
 			Blockings[tag].timeD = [aD[0], aD[1]]
 			for (let i = 0; i < aB.impacted.length; i++) {
 				const itemTag = aB.impacted[i];
@@ -410,7 +421,6 @@ function doBlock() {
 				Blockings[itemTag].timeBd = tag
 			}
 		}
-
 	}
 	for (var key in Blockings) {
 		if (Blockings[key].isB) {
@@ -426,11 +436,10 @@ function doBlock() {
 		}
 		// console.log(key + ": " + Blockings[key]);
 	}
-	console.log(Blockings)
+	// console.log(Blockings)
 	chrome.storage.local.set({
 		isBlocking: Blockings
 	})
-	// console.log(Blockings)
 	return Blockings
 }
 function isTimeInRange(startTime, endTime) {
