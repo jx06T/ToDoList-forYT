@@ -65,6 +65,21 @@ async function UpData() {
 
 		chrome.storage.local.set({ isBlocking: Blockings })
 	}
+	chrome.storage.local.get("AllTodo").then((a) => {
+		AllTodo = a.AllTodo;
+		AllTodo.forEach(aTodo => {
+			aTodo.time -= (Math.round(Date.now() / 1000)-aTodo.UpdateTime)
+			aTodo.UpdateTime = Math.round(Date.now() / 1000)
+			if (aTodo.time == 0 || aTodo.time == -1 || aTodo.time == -3 || (aTodo.time < 0 && aTodo.time % 15 == 0)) {
+				notify(aTodo.text + "已經到期", "狀態：" + aTodo.state + "　　時間：" + aTodo.time + "min")
+			} else if (aTodo.time == 3 || aTodo.time == 20 || aTodo.time == 60 || aTodo.time == 180) {
+				notify(aTodo.text + "將要到期", "狀態：" + aTodo.state + "　　時間：" + aTodo.time + "min")
+			}
+		});
+		chrome.storage.local.set({
+			AllTodo: AllTodo
+		})
+	})
 	// console.log(ThisBrowsingTime, Blockings)
 }
 // DeBugResetData()
@@ -94,18 +109,6 @@ chrome.runtime.onStartup.addListener(() => {
 	// chrome.tabs.create({ url: chrome.runtime.getURL('options\\options.html') });
 });
 chrome.runtime.onInstalled.addListener(() => {
-	// var notificationOptions = {
-	// 	type: "basic",
-	// 	title: "這是標題",
-	// 	message: "這是訊息內容",
-	// 	// iconUrl: "https://pbs.twimg.com/media/FcBzu0yagAABRvD.jpg" // 請替換為您自己的圖示 URL
-	// 	iconUrl: "images\\ToDoYT128.png" // 請替換為您自己的圖示 URL
-	// };
-
-	// // 創建通知
-	// chrome.notifications.create("my-notification", notificationOptions, function (notificationId) {
-	// 	console.log("通知已創建，ID：" + notificationId);
-	// });
 	UpData()
 	// chrome.tabs.create({ url: chrome.runtime.getURL('options\\options.html') });
 })
@@ -273,15 +276,66 @@ function ELSE(aTab) {
 	})
 }
 chrome.alarms.create('readLoop', { periodInMinutes: 3 / 60 });
+chrome.alarms.create('TodoLoop', { periodInMinutes: 1 });
 
 chrome.alarms.onAlarm.addListener(alarm => {
 	if (alarm.name === 'readLoop') {
 		// count++
 		doTask(doBlock());
 	}
+	if (alarm.name === 'TodoLoop') {
+		doTodoChange()
+	}
 	if (alarm.name === 'midnight') {
 		UpData()
 		chrome.alarms.create('midnight', { when: getMidnight() });
+	}
+});
+//-------------------------------------------------------------------------------------------------------------------------
+function notify(title, content) {
+	let notificationOptions = {
+		type: "basic",
+		title: title,
+		message: content,
+		iconUrl: "images\\T1.jpg", // 請替換為您自己的圖示 URL
+		priority: 1
+	};
+
+	chrome.notifications.create("timeout" + RandNotifyId(), notificationOptions, (notificationId) => {
+		console.log("ID：" + notificationId);
+	});
+}
+function RandNotifyId() {
+	return Math.random().toString(36).substring(2.9)
+}
+function doTodoChange() {
+	chrome.storage.local.get("AllTodo").then((a) => {
+		AllTodo = a.AllTodo;
+		AllTodo.forEach(aTodo => {
+			aTodo.time -= 1
+			aTodo.UpdateTime = Math.round(Date.now() / 1000)
+			if (aTodo.time == 0 || aTodo.time == -1 || aTodo.time == -3 || (aTodo.time < 0 && aTodo.time % 15 == 0)) {
+				notify(aTodo.text + "已經到期", "狀態：" + aTodo.state + "　｜　時間：" + aTodo.time + "min")
+			} else if (aTodo.time == 3 || aTodo.time == 20 || aTodo.time == 60 || aTodo.time == 180) {
+				notify(aTodo.text + "將要到期", "狀態：" + aTodo.state + "　｜　時間：" + aTodo.time + "min")
+			}
+		});
+		chrome.storage.local.set({
+			AllTodo: AllTodo
+		})
+	})
+}
+chrome.notifications.onClicked.addListener(function (notificationId) {
+	if (notificationId.includes("timeout")) {
+		let urlToOpen = chrome.runtime.getURL('ToDoList.html');
+		chrome.tabs.query({ url: urlToOpen }, function (tabs) {
+			if (tabs.length > 0) {
+				chrome.tabs.update(tabs[0].id, { active: true });
+			} else {
+				chrome.tabs.create({ url: urlToOpen });
+			}
+		});
+		// chrome.tabs.create({ url: chrome.runtime.getURL('ToDoList.html') });
 	}
 });
 //-------------------------------------------------------------------------------------------------------------------------
@@ -399,7 +453,7 @@ function doBlock() {
 		for (let j = 0; j < aB.disabled.length; j++) {
 			const aD = aB.disabled[j];
 			let T = isTimeInRange(aD[0], aD[1])
-			console.log(aB,Blockings[tag],T)
+			// console.log(aB, Blockings[tag], T)
 			if (T) {
 				Blockings[tag].isD = T
 				Blockings[tag].ID = aB.ID

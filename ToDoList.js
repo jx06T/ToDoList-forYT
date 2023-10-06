@@ -56,6 +56,11 @@ let isNeedUpData = false
 function InitData() {
     chrome.storage.local.get(["AllTodo"]).then((result) => {
         AllTodo = result.AllTodo
+        if (AllTodo.length == 0) {
+            sortTB.dataset.s = 2
+            sortSB.dataset.s = 2
+            return
+        }
         const s = AllTodo[0]._sort_
         console.log(s)
         sortTB.dataset.s = s > 0 ? s + 2 : 2
@@ -63,8 +68,12 @@ function InitData() {
     })
     chrome.storage.local.get(["AllNote"]).then((result) => {
         AllNote = result.AllNote
+        let tempSore = 2
+        if (AllTodo.length > 0) {
+            tempSore = AllTodo[0]._sort_
+        }
         setTimeout(() => {
-            InitTable(AllTodo[0]._sort_)
+            InitTable(tempSore)
         }, 10);
     })
 }
@@ -77,12 +86,22 @@ chrome.storage.onChanged.addListener(function (changes, areaName) {
         if (changes.AllTodo) {
             isNeedUpData = true
             AllTodo = changes.AllTodo.newValue
+            if (AllTodo.length == 0) {
+                return
+            }
+            if (!AllTodo[0]._sort_) {
+                AllTodo[0]._sort_ = 1
+            }
+
         }
 
     }
 });
 window.addEventListener('focus', () => {
     if (isNeedUpData) {
+        if (AllTodo.length == 0) {
+            return
+        }
         InitTable(AllTodo[0]._sort_)
         isNeedUpData = false
     }
@@ -238,10 +257,13 @@ TodoList.addEventListener("click", (event) => {
     const target = event.target;
     const parent = target.parentNode
     // console.log(parent)
-    if (target.classList.contains('todo-state')) {
-        const index = Number(parent.dataset.index)
+    const index = Number(parent.dataset.index)
+    if (index != -1 && target.classList.contains('todo-state')) {
         // console.log(target, parent)
         if (target.classList.contains("DD")) {
+            if (AllTodo.length > 1 && index == 0) {
+                AllTodo[1]._sort_ = AllTodo[0]._sort_
+            }
             AllTodo.splice(index, 1)
             parent.remove()
             UpData()
@@ -312,7 +334,7 @@ TodoList.addEventListener("input", (event) => {
         parent.querySelector(".todo-time").dataset.time = 60
         parent.parentNode.appendChild(GetNewTodo())
         AllTodo.push({
-            text: target.value, time: 60, states: "★"
+            _sort_: 1, text: target.value, time: 60, state: "★"
         })
         parent.dataset.index = AllTodo.length - 1
         UpData()
@@ -380,6 +402,9 @@ function GetNewTodo(text = "", time = "－－－", state = '★', i = -1) {
     ul.classList.add("todo-item")
     if (time == "－－－") {
         ul.classList.add("NewTodo")
+    }
+    if (time < 0) {
+        ul.classList.add("timeout")
     }
     let a1 = document.createElement('a');
     a1.innerText = state
@@ -481,8 +506,14 @@ document.addEventListener("load", () => {
     init()
 })
 setInterval(() => {
+    if (AllTodo.length == 0) {
+        return
+    }
+    InitTable(AllTodo[0]._sort_)
+}, 60000);
+setInterval(() => {
     let ttime = time
-    if (text == "休息時間到（$ min）") {
+    if (text == "休息時間到（$ min）" || text == "受TEST影響：休息時間到（$ min）") {
         time = time - (5 / 60)
         ttime = Math.abs(parseFloat(time).toFixed(2))
     }
@@ -509,15 +540,15 @@ function GetTEXT(TT, t, c) {
         text = "禁用時間$"
         time = T.timeD[0] + "～" + T.timeD[1]
     }
+    if (text == "休息時間到（$ min）") {
+        time = Math.abs(parseFloat(time).toFixed(2))
+    }
     if (c == 0) {
         return
     }
     if (T.isBd) {
         GetTEXT(TT, T.timeBd, 0)
         text = "受" + T.timeBd + "影響：" + text
-    }
-    if (text == "休息時間到（$ min）") {
-        time = Math.abs(parseFloat(time).toFixed(2))
     }
     console.log(text, time)
     textD.innerText = text.replace("$", time)

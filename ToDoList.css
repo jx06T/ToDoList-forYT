@@ -184,6 +184,10 @@ h2 {
   width: 230px;
 }
 
+.timeout .Myinput1 {
+  background-color: #ff6a52;
+}
+
 .todo-list {
   list-style: none;
   padding: 0;
@@ -200,6 +204,10 @@ h2 {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   position: relative;
   /* display: flex; */
+}
+
+.todo-item.timeout {
+  background-color: #ff6a52;
 }
 
 .todo-item.sort {
@@ -245,8 +253,16 @@ h2 {
   background-color: #d8f1f7;
 }
 
+.todo-item.timeout:hover {
+  background-color: #ff2d2d;
+}
+
 .todo-item:hover .Myinput1 {
   background-color: #d8f1f7;
+}
+
+.todo-item.timeout:hover .Myinput1 {
+  background-color: #ff2d2d;
 }
 
 .NewTodo.todo-item:hover .Myinput1 {

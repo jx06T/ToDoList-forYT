@@ -37,9 +37,11 @@ function GetTag() {
         }
         let _opposite = true
         let _stop = false
+        let _secondary = false
         if (aTag.rule[0].slice(0, 3) == "!--") {
             _opposite = !aTag.rule[0].includes("--opposite")
             _stop = aTag.rule[0].includes("--stop")
+            _secondary = aTag.rule[0].includes("--secondary")
         }
         for (let j = 0; j < aTag.rule.length; j++) {
             if (aTag.rule[j] == "" || aTag.rule[j].slice(0, 3) == "!--") {
@@ -48,7 +50,7 @@ function GetTag() {
             const aRule = RegExp(aTag.rule[j])
             if (opposite(aRule.test(Myhostname), _opposite)) {
                 // console.log(aRule.test(Myhostname), aTag.tag, _opposite, _stop)
-                if (Mytag == "ELSE") {
+                if (Mytag == "ELSE" && !_secondary) {
                     Mytag = aTag.tag
                 }
                 Mytags.push(aTag.tag)
@@ -188,17 +190,24 @@ iframe.allow = 'microphone;camera;';
 iframe.sandbox = 'allow-scripts allow-same-origin allow-forms';
 iframe.setAttribute('allowFullScreen', '');
 iframe.src = chrome.runtime.getURL('ToDoList.html') + "#tag-" + Mytag;
+
 function doBlock(B, isBlock) {
-    console.log(B, isBlock, Mytag)
-    const T = (B[Mytag].isBd == true || B[Mytag].isB == true || B[Mytag].isL == true || B[Mytag].isD == true)
-    if (T && !isBlock) {
-        isBlock = true
-        iframe.src = chrome.runtime.getURL('ToDoList.html') + "#tag-" + Mytag;
-        document.body.appendChild(iframe);
-    } else if (!T && isBlock) {
-        isBlock = false
-        iframe.remove()
-    }
+    console.log(B, isBlock, Mytag, Mytags)
+    Mytags.forEach(element => {
+        if (!B[element]) {
+            return
+        }
+        const T = (B[element].isBd == true || B[element].isB == true || B[element].isL == true || B[element].isD == true)
+        console.log(T, element)
+        if (T && !isBlock) {
+            isBlock = true
+            iframe.src = chrome.runtime.getURL('ToDoList.html') + "#tag-" + element;
+            document.body.appendChild(iframe);
+        } else if (!T && isBlock) {
+            isBlock = false
+            iframe.remove()
+        }
+    });
 }
 
 window.addEventListener('message', function (event) {
