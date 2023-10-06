@@ -328,7 +328,7 @@ function doBlock() {
 		if (aB.rest[0] != "" && !Blockings[tag].isB && ThisBrowsingTime[tag]._total_ - Blockings[tag].LastTime > aB.rest[0] * 60) {
 			Blockings[tag].LastTime = Date.now() / 1000
 			Blockings[tag].isB = true
-			Blockings[tag].id = aB.ID
+			Blockings[tag].ID = aB.ID
 			Blockings[tag].timeB = aB.rest[1].toFixed(2)
 			for (let i = 0; i < aB.impacted.length; i++) {
 				const itemTag = aB.impacted[i];
@@ -362,7 +362,7 @@ function doBlock() {
 
 		if (aB.limit[0] != "" && !Blockings[tag].isL && ThisBrowsingTime[tag]._total_ - Blockings[tag].LLastBT > aB.limit[0] * 3600) {
 			Blockings[tag].isL = true
-			Blockings[tag].id = aB.ID
+			Blockings[tag].ID = aB.ID
 			Blockings[tag].timeL = aB.limit[0].toFixed(2) + "／" + aB.limit[1].toFixed(2)
 			for (let i = 0; i < aB.impacted.length; i++) {
 				const itemTag = aB.impacted[i];
@@ -399,9 +399,10 @@ function doBlock() {
 		for (let j = 0; j < aB.disabled.length; j++) {
 			const aD = aB.disabled[j];
 			let T = isTimeInRange(aD[0], aD[1])
+			console.log(aB,Blockings[tag],T)
 			if (T) {
 				Blockings[tag].isD = T
-				Blockings[tag].id = aB.ID
+				Blockings[tag].ID = aB.ID
 			} else if (Blockings[tag].ID == aB.ID) {
 				Blockings[tag].isD = T
 			} else {
