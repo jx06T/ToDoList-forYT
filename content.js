@@ -190,12 +190,14 @@ iframe.allow = 'microphone;camera;';
 iframe.sandbox = 'allow-scripts allow-same-origin allow-forms';
 iframe.setAttribute('allowFullScreen', '');
 iframe.src = chrome.runtime.getURL('ToDoList.html') + "#tag-" + Mytag;
+let BlockadeBy = undefined
 
 function doBlock(B, isBlock) {
     console.log(B, isBlock, Mytag, Mytags)
-    Mytags.forEach(element => {
+    for (let i = 0; i < Mytags.length; i++) {
+        const element = Mytags[i];
         if (!B[element]) {
-            return
+            continue
         }
         const T = (B[element].isBd == true || B[element].isB == true || B[element].isL == true || B[element].isD == true)
         console.log(T, element)
@@ -203,11 +205,13 @@ function doBlock(B, isBlock) {
             isBlock = true
             iframe.src = chrome.runtime.getURL('ToDoList.html') + "#tag-" + element;
             document.body.appendChild(iframe);
-        } else if (!T && isBlock) {
+            BlockadeBy = element
+            return
+        } else if (BlockadeBy == element && !T && isBlock) {
             isBlock = false
             iframe.remove()
         }
-    });
+    };
 }
 
 window.addEventListener('message', function (event) {

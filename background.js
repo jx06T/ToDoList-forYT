@@ -316,8 +316,8 @@ function doTodoChange() {
 			return
 		}
 		let T = 1
-		if ((Math.round(Date.now() / 60000) - aTodo.UpdateTime) > 1 && aTodo.UpdateTime != undefined) {
-			T = Math.round(Date.now() / 60000) - aTodo.UpdateTime
+		if ((Math.round(Date.now() / 60000) - AllTodo[1].UpdateTime) > 1 && AllTodo[1].UpdateTime != undefined) {
+			T = Math.round(Date.now() / 60000) - AllTodo[1].UpdateTime
 		}
 		AllTodo.forEach(aTodo => {
 			aTodo.time -= T

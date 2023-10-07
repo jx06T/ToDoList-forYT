@@ -264,6 +264,7 @@ TodoList.addEventListener("click", (event) => {
             if (AllTodo.length > 1 && index == 0) {
                 AllTodo[1]._sort_ = AllTodo[0]._sort_
             }
+            parent.classList.remove("timeout")
             AllTodo.splice(index, 1)
             parent.remove()
             UpData()
