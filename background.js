@@ -68,12 +68,13 @@ async function UpData() {
 	chrome.storage.local.get("AllTodo").then((a) => {
 		AllTodo = a.AllTodo;
 		AllTodo.forEach(aTodo => {
-			aTodo.time -= (Math.round(Date.now() / 1000)-aTodo.UpdateTime)
-			aTodo.UpdateTime = Math.round(Date.now() / 1000)
-			if (aTodo.time == 0 || aTodo.time == -1 || aTodo.time == -3 || (aTodo.time < 0 && aTodo.time % 15 == 0)) {
-				notify(aTodo.text + "已經到期", "狀態：" + aTodo.state + "　　時間：" + aTodo.time + "min")
+			aTodo.time -= (Math.round(Date.now() / 60000) - aTodo.UpdateTime)
+			// console.log(aTodo, aTodo.time, Math.round(Date.now() / 60000), aTodo.UpdateTime,)
+			aTodo.UpdateTime = Math.round(Date.now() / 60000)
+			if (aTodo.time < 0) {
+				notify(aTodo.text + " 已過期" + -aTodo.time + "分鐘", "時間：" + aTodo.time + "min（" + aTodo.state + "）")
 			} else if (aTodo.time == 3 || aTodo.time == 20 || aTodo.time == 60 || aTodo.time == 180) {
-				notify(aTodo.text + "將要到期", "狀態：" + aTodo.state + "　　時間：" + aTodo.time + "min")
+				notify(aTodo.text + " 還有" + aTodo.time + "分鐘到期", "時間：" + aTodo.time + "min（" + aTodo.state + "）")
 			}
 		});
 		chrome.storage.local.set({
@@ -311,13 +312,21 @@ function RandNotifyId() {
 function doTodoChange() {
 	chrome.storage.local.get("AllTodo").then((a) => {
 		AllTodo = a.AllTodo;
+		if (AllTodo.length == 0) {
+			return
+		}
+		let T = 1
+		if ((Math.round(Date.now() / 60000) - aTodo.UpdateTime) > 1 && aTodo.UpdateTime != undefined) {
+			T = Math.round(Date.now() / 60000) - aTodo.UpdateTime
+		}
 		AllTodo.forEach(aTodo => {
-			aTodo.time -= 1
-			aTodo.UpdateTime = Math.round(Date.now() / 1000)
+			aTodo.time -= T
+			// console.log(Math.round(Date.now() / 1000))
+			aTodo.UpdateTime = Math.round(Date.now() / 60000)
 			if (aTodo.time == 0 || aTodo.time == -1 || aTodo.time == -3 || (aTodo.time < 0 && aTodo.time % 15 == 0)) {
-				notify(aTodo.text + "已經到期", "狀態：" + aTodo.state + "　｜　時間：" + aTodo.time + "min")
+				notify(aTodo.text + " 已過期" + -aTodo.time + "分鐘", "時間：" + aTodo.time + "min（" + aTodo.state + "）")
 			} else if (aTodo.time == 3 || aTodo.time == 20 || aTodo.time == 60 || aTodo.time == 180) {
-				notify(aTodo.text + "將要到期", "狀態：" + aTodo.state + "　｜　時間：" + aTodo.time + "min")
+				notify(aTodo.text + " 還有" + aTodo.time + "分鐘到期", "時間：" + aTodo.time + "min（" + aTodo.state + "）")
 			}
 		});
 		chrome.storage.local.set({
