@@ -194,20 +194,23 @@ let BlockadeBy = undefined
 
 function doBlock(B, isBlock) {
     console.log(B, isBlock, Mytag, Mytags)
+    if (!Mytags.includes(BlockadeBy)) {
+        BlockadeBy = null
+    }
     for (let i = 0; i < Mytags.length; i++) {
         const element = Mytags[i];
         if (!B[element]) {
             continue
         }
         const T = (B[element].isBd == true || B[element].isB == true || B[element].isL == true || B[element].isD == true)
-        console.log(T, element)
+        console.log(T, element, BlockadeBy,isBlock)
         if (T && !isBlock) {
             isBlock = true
             iframe.src = chrome.runtime.getURL('ToDoList.html') + "#tag-" + element;
             document.body.appendChild(iframe);
             BlockadeBy = element
             return
-        } else if (BlockadeBy == element && !T && isBlock) {
+        } else if ((BlockadeBy == null||BlockadeBy == element) && !T && isBlock) {
             isBlock = false
             iframe.remove()
         }
