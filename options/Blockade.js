@@ -13,13 +13,14 @@ class BlockadeMM {
         this.limit1I = this.BlockingSettings.querySelector("#limit1")
         this.limit2I = this.BlockingSettings.querySelector("#limit2")
         this.disabledsD = this.BlockingSettings.querySelector("#disableds")
+        this.DayOfWeekD = this.BlockingSettings.querySelector("#DayOfWeeks")
         this.deleteB = this.BlockingSettings.querySelector("#BlockingDelete")
         this.OkB = this.BlockingSettings.querySelector("#BlockingOk")
         this.advanceI = this.BlockingSettings.querySelector("#Advance")
         this.copyB = this.BlockingSettings.querySelector("#copy")
 
         this.TEMPLATE = {
-            tag: '', limit: ["", ""], rest: ["", ""], impacted: ["", "", ""], restricted: true, disabled: [], advance: ""
+            tag: '', limit: ["", ""], rest: ["", ""], impacted: ["", "", ""], restricted: true, disabled: [], advance: "", WorkDay: [0, 1, 2, 3, 4, 5, 6]
         }
         setTimeout(() => {
             this.init()
@@ -104,13 +105,18 @@ class BlockadeMM {
         return newRow
     }
     GetText = (aTag) => {
+        const AllDays = ["日", "一", "二", "三", "四", "五", "六"]
         let t1 = `restricted：${aTag.restricted}
         impacted：${aTag.impacted}
         rest（min）： ${aTag.rest[0]} ▷ ${aTag.rest[1]}
         limit（hr）：  ${aTag.limit[0]}／ ${aTag.limit[1]} 
-        Advance notice（min）：  ${aTag.advance}`
+        Advance notice（min）：  ${aTag.advance}
+        WorkDay： ${AllDays.map((item, i) => {
+            return aTag.WorkDay.includes(i) ? item : "　"
+        }).join("")
+            }`
         const disabled = aTag.disabled.map(item => {
-            return `${item[0].replace(':', '：')}～${item[1].replace(':', '：')}`
+            return `${item[0].replace(':', '：')}～${item[1].replace(':', '：')} `
         })
         let t2 = 'disabled：\n' + disabled.join("\n")
         return [t1, t2]
@@ -264,6 +270,17 @@ class BlockadeMM {
                         disabled[0] = item.childNodes[0].value
                         disabled[1] = item.childNodes[2].value
                     })
+
+                    let WorkDay = []
+                    this.DayOfWeekD.childNodes.forEach((item, ii) => {
+                        if (ii % 2 == 0) {
+                            return
+                        }
+                        if (item.checked) {
+                            WorkDay.push((ii - 1) / 2)
+                        }
+                    });
+                    aTag.WorkDay = WorkDay
                     break
             }
 
@@ -335,6 +352,12 @@ class BlockadeMM {
             item.childNodes[0].value = aTag.disabled[Math.floor(ii / 2)][0]
             item.childNodes[2].value = aTag.disabled[Math.floor(ii / 2)][1]
         })
+        this.DayOfWeekD.childNodes.forEach((item, ii) => {
+            if (ii % 2 == 0) {
+                return
+            }
+            item.checked = aTag.WorkDay.includes((ii-1)/2)
+        });
     }
     ResetId = () => {
         const rows = this.RuleTable.querySelectorAll('tr');

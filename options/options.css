@@ -439,3 +439,9 @@ hr {
     display: flex;
     flex-flow: column;
 }
+/* ------------------------------------------------------------- */
+.DayOfWeek{
+    width: 20px;
+    height: 20px;
+    margin-right: 9px;
+}

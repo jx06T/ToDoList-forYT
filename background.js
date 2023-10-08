@@ -370,11 +370,13 @@ chrome.storage.onChanged.addListener(function (changes, areaName) {
 
 function doBlock() {
 	let tempAllTag = []
+	const TodaysDay = new Date().getDay()
 	for (let i = 0; i < Blockade.length; i++) {
 		const aB = Blockade[i];
 		const tag = aB.tag
 		tempAllTag.push(tag)
-		if (tag == "" || ThisBrowsingTime[tag] == undefined || aB.restricted == false) {
+		// console.log(aB.WorkDay, TodaysDay,!aB.WorkDay.includes(TodaysDay),tag)
+		if (!aB.WorkDay.includes(TodaysDay) || tag == "" || ThisBrowsingTime[tag] == undefined || aB.restricted == false) {
 			continue
 		}
 		// console.log(aB)
