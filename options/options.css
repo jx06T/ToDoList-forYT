@@ -280,7 +280,7 @@ input:checked+.slider:before {
     animation: showDiv 0.2s;
     background-color: rgba(240, 240, 240, 0.9);
     width: 600px;
-    height: 300px;
+    height: 310px;
     position: fixed;
     top: 200px;
     left: 320px;

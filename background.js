@@ -376,7 +376,7 @@ function doBlock() {
 		const tag = aB.tag
 		tempAllTag.push(tag)
 		// console.log(aB.WorkDay, TodaysDay,!aB.WorkDay.includes(TodaysDay),tag)
-		if (!aB.WorkDay.includes(TodaysDay) || tag == "" || ThisBrowsingTime[tag] == undefined || aB.restricted == false) {
+		if (tag == "" || ThisBrowsingTime[tag] == undefined || aB.restricted == false) {
 			continue
 		}
 		// console.log(aB)
@@ -390,7 +390,7 @@ function doBlock() {
 			Blockings[tag].isD = false
 		}
 
-		if (aB.rest[0] != "" && !Blockings[tag].isB && ThisBrowsingTime[tag]._total_ - Blockings[tag].LastTime > aB.rest[0] * 60) {
+		if (aB.WorkDay.includes(TodaysDay) && aB.rest[0] != "" && !Blockings[tag].isB && ThisBrowsingTime[tag]._total_ - Blockings[tag].LastTime > aB.rest[0] * 60) {
 			Blockings[tag].LastTime = Date.now() / 1000
 			Blockings[tag].isB = true
 			Blockings[tag].ID = aB.ID
@@ -425,7 +425,7 @@ function doBlock() {
 			console.log(2, tag)
 		}
 
-		if (aB.limit[0] != "" && !Blockings[tag].isL && ThisBrowsingTime[tag]._total_ - Blockings[tag].LLastBT > aB.limit[0] * 3600) {
+		if (aB.WorkDay.includes(TodaysDay) && aB.limit[0] != "" && !Blockings[tag].isL && ThisBrowsingTime[tag]._total_ - Blockings[tag].LLastBT > aB.limit[0] * 3600) {
 			Blockings[tag].isL = true
 			Blockings[tag].ID = aB.ID
 			Blockings[tag].timeL = aB.limit[0].toFixed(2) + "／" + aB.limit[1].toFixed(2)
@@ -466,8 +466,10 @@ function doBlock() {
 			let T = isTimeInRange(aD[0], aD[1])
 			// console.log(aB, Blockings[tag], T)
 			if (T) {
-				Blockings[tag].isD = T
-				Blockings[tag].ID = aB.ID
+				if (aB.WorkDay.includes(TodaysDay)) {
+					Blockings[tag].isD = T
+					Blockings[tag].ID = aB.ID
+				}
 			} else if (Blockings[tag].ID == aB.ID) {
 				Blockings[tag].isD = T
 			} else {
@@ -493,10 +495,11 @@ function doBlock() {
 			Blockings[key].timeB -= 3 / 60
 			if (tempAllTag.indexOf(key) == -1) {
 				Blockings[key].timeB.deleteCount += 1
+				console.log(key)
 			} else {
 				Blockings[key].timeB.deleteCount = 0
 			}
-			if (Blockings[key].timeB.deleteCount > 19) {
+			if (Blockings[key].timeB.deleteCount > 15) {
 				Blockings[key] = undefined
 			}
 		}
