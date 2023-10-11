@@ -472,9 +472,34 @@ const textD = document.querySelector("#text")
 const RandTasksD = document.querySelector("#RandomTasks")
 const RandTasks = ["吃飯", '跳繩', '鋼琴']
 const urgentB = document.querySelector("#urgent")
+const delayB = document.querySelector("#delay")
+const delayTimerD = document.querySelector("#delayTimer")
+const delayTimerI = document.querySelector("#delayTimerr")
+
 
 urgentB.addEventListener('click', () => {
     window.parent.postMessage("urgent", '*');
+})
+delayTimerI.addEventListener("change", () => {
+    delayB.innerText = "延後"
+    delayTimerD.classList.remove("show")
+    let delayTime = Number(delayTimerI.value) / 10
+    if (delayTime == 0 || Mytag == null) {
+        return
+    }
+    chrome.runtime.sendMessage({ action: "delay", tag: Mytag, time: delayTime })
+})
+delayTimerI.addEventListener("input", () => {
+    delayB.innerText = Number(delayTimerI.value) / 10 + "(min)"
+})
+
+delayB.addEventListener('click', () => {
+    if (Mytag == null) {
+        // return
+    }
+    delayTimerD.classList.add("show")
+    delayTimerI.value = 30
+    delayB.innerText = Number(delayTimerI.value) / 10 + "(min)"
 
 })
 

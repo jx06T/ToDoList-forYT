@@ -134,6 +134,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	const dns = new URL(sender.origin).hostname;
 	// console.log(request, sender)
 	switch (A) {
+		case "delay":
+			Blockings[request.tag].delayTime = request.time
+			break
 		case "test":
 			console.log("!!!!!", sender, request.TestText)
 			break

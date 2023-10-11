@@ -1,5 +1,5 @@
 * {
-  font-family:  'Noto Sans TC', '微軟正黑體', "sans-serif";
+  font-family: 'Noto Sans TC', '微軟正黑體', "sans-serif";
 }
 
 #BigDiv {
@@ -388,8 +388,9 @@ h2 {
 
   margin-top: 10px;
   margin-bottom: 10px;
-  margin: 5px;
-  width: 50%;
+  margin: 8px;
+  min-width: 95px;
+  height: 40px;
   font-size: 20px;
   background-color: #ffe2e2;
 }
@@ -425,4 +426,18 @@ h2.h22 {
 .sortB.second {
   background: #e6e6e6;
   color: #919597;
+}
+
+
+/* ------------------------------------------------------ */
+#delayTimer {
+  display: none;
+  width: 100%;
+}
+
+#delayTimer.show {
+  display: block  ;
+}
+#delayTimerr{
+  width: 100%;
 }

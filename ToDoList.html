@@ -93,16 +93,22 @@
                 <div id="text">
                     <!-- 待辦事項 -->
                 </div>
-                <div class="LR" style="
+                <div class="UD" style="
                 align-items: center;">
-                    <button class="MyButton1" id="delay">延後</button>
-                    <button class="MyButton1" id="urgent">緊急</button>
+                    <div class="LR">
+                        <button class="MyButton1" id="delay">延後</button>
+                        <button class="MyButton1" id="urgent">緊急</button>
+                    </div>
+                    <div id="delayTimer">
+                        <input id="delayTimerr" type="range" max="100" class="TimeSliders2" min="0">
+                    </div>
                 </div>
                 <h2 class="h22">Random tasks</h2>
                 <div class="signs" id="RandomTasks">吃飯</div>
             </div>
         </div>
     </div>
+
     <script src="ToDoList.js"></script>
 </body>
 

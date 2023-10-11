@@ -203,14 +203,14 @@ function doBlock(B, isBlock) {
             continue
         }
         const T = (B[element].isBd == true || B[element].isB == true || B[element].isL == true || B[element].isD == true)
-        console.log(T, element, BlockadeBy,isBlock)
+        console.log(T, element, BlockadeBy, isBlock)
         if (T && !isBlock) {
             isBlock = true
             iframe.src = chrome.runtime.getURL('ToDoList.html') + "#tag-" + element;
             document.body.appendChild(iframe);
             BlockadeBy = element
             return
-        } else if ((BlockadeBy == null||BlockadeBy == element) && !T && isBlock) {
+        } else if ((BlockadeBy == null || BlockadeBy == element) && !T && isBlock) {
             isBlock = false
             iframe.remove()
         }
