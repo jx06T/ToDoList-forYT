@@ -1,6 +1,12 @@
 
-const TitleT = document.querySelector("title")
-let Title = TitleT.innerText
+setTimeout(() => {
+    TitleT = document.querySelector("title")
+    Title = TitleT.innerText
+    InitData()
+    console.log(TitleT)
+}, 500);
+let TitleT
+let Title
 let Mytag = "ELSE"
 let Mytags = ["ALL"]
 let Jumping_in_line_count = 0
@@ -20,7 +26,6 @@ chrome.storage.onChanged.addListener(function (changes, areaName) {
         }
     }
 });
-InitData()
 let isOnFocus = true
 let moveCount = 0;
 let MovementCount = 0
