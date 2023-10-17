@@ -305,7 +305,8 @@ class BlockadeMM {
         })
         this.copyB.addEventListener("click", () => {
             const index = Number(this.BlockingSettings.dataset.index)
-            const copy = JSON.parse(JSON.stringify(this.Blockade[index]))
+            let copy = JSON.parse(JSON.stringify(this.Blockade[index]))
+            copy.ID = this.randId()
             this.Blockade.splice(index, 0, copy);
             this.UpData(this.Blockade)
             let HTML = this.GetNewRow(copy)
@@ -356,7 +357,7 @@ class BlockadeMM {
             if (ii % 2 == 0) {
                 return
             }
-            item.checked = aTag.WorkDay.includes((ii-1)/2)
+            item.checked = aTag.WorkDay.includes((ii - 1) / 2)
         });
     }
     ResetId = () => {
