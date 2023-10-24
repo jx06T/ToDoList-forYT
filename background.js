@@ -1,6 +1,6 @@
 function InitData() {
 	let today = new Date()
-	chrome.storage.local.set({ AllBrowsingTime: { Date: [GetMyDay(today), today.getDay()], BrowsingTime: {} } })
+	chrome.storage.local.set({ AllBrowsingTime: { Date: [GetMyDay(today), today.getDay()], BrowsingTime: { "ALL": { "_total_": 0 } } } })
 	chrome.storage.local.set({ LastUpDataTime: [GetMyDay(today), today.getDay()] })
 	chrome.storage.local.set({ aWeek: [{}] })
 	chrome.storage.local.set({
@@ -53,12 +53,13 @@ async function UpData() {
 			if (aWeek.length > 3) {
 				aWeek.shift()
 			}
+
 			aWeek.push({})
 		}
 		aWeek[aWeek.length - 1][today.getDay()] = { Date: GetMyDay(today), BrowsingTime: null }
 
 		chrome.storage.local.set({ aWeek: aWeek })
-		const tempThisBrowsingTime = { Date: [GetMyDay(today), today.getDay()], BrowsingTime: {} }
+		const tempThisBrowsingTime = { Date: [GetMyDay(today), today.getDay()], BrowsingTime: { "ALL": { "_total_": 0 } } }
 		chrome.storage.local.set({ AllBrowsingTime: tempThisBrowsingTime })
 		ThisBrowsingTime = tempThisBrowsingTime
 		chrome.storage.local.set({ LastUpDataTime: [GetMyDay(today), today.getDay()] })
@@ -195,6 +196,7 @@ function AddTime(tag, dns, title) {
 		let rBrowsingTime = result.AllBrowsingTime
 		let OldAllBrowsingTime = rBrowsingTime.BrowsingTime
 
+		OldAllBrowsingTime.ALL._total_ += BrowsingTime
 		OldAllBrowsingTime[tag] = OldAllBrowsingTime[tag] || { _total_: 0 }
 		OldAllBrowsingTime[tag][dns] = OldAllBrowsingTime[tag][dns] || { _total_: 0 }
 		OldAllBrowsingTime[tag][dns][title] = OldAllBrowsingTime[tag][dns][title] || 0
@@ -378,8 +380,8 @@ function doBlock() {
 		const aB = Blockade[i];
 		const tag = aB.tag
 		tempAllTag.push(tag)
-		// console.log(aB.WorkDay, TodaysDay,!aB.WorkDay.includes(TodaysDay),tag)
-		if (tag == "" || ThisBrowsingTime[tag] == undefined || aB.restricted == false) {
+		console.log(aB.WorkDay, TodaysDay, !aB.WorkDay.includes(TodaysDay), tag)
+		if (tag == "" || (tag != "ALL" && ThisBrowsingTime[tag] == undefined) || aB.restricted == false) {
 			continue
 		}
 		// console.log(aB)
@@ -393,6 +395,7 @@ function doBlock() {
 			Blockings[tag].isD = false
 		}
 
+		console.log(aB.ID, tag, aB.WorkDay.includes(TodaysDay), !Blockings[tag].isB, ThisBrowsingTime[tag]._total_, Blockings[tag].LastTime, aB.rest[0] * 60)
 		if (aB.WorkDay.includes(TodaysDay) && aB.rest[0] != "" && !Blockings[tag].isB && ThisBrowsingTime[tag]._total_ - Blockings[tag].LastTime > aB.rest[0] * 60) {
 			Blockings[tag].LastTime = Date.now() / 1000
 			Blockings[tag].isB = true
